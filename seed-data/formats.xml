@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<formats>
+    <format type="ImageObject" name="TIFF" extension="tif" mimetype="image/tiff"/>
+    <format type="ImageObject" name="PNG" extension="png" mimetype="image/png"/>
+    <format type="ImageObject" name="JPG" extension="jpg" mimetype="image/jpg"/>
+    <format type="ImageObject" name="SVG" extension="svg" mimetype="image/svg"/>
+    <format type="AudioObject" mimetype="audio/wave"/>
+    <format type="AudioObject" mimetype="audio/webm"/>
+    <format type="AudioObject" mimetype="audio/ogg"/>
+    <format type="VideoObject" mimetype="video/ogg"/>
+    <format type="VideoObject" mimetype="video/webm"/>
+    <format type="NarrativeText" mimetype="application/xml"/>
+</formats>

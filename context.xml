@@ -1,0 +1,13 @@
+<xpf:array key="@context" xmlns:xpf="http://www.w3.org/2005/xpath-functions">
+    <xpf:string>https://schema.pearson.com/context/terms-context.jsonld</xpf:string>
+    <xpf:string>https://schema.pearson.com/context/xowl-context.jsonld</xpf:string>
+    <xpf:string>https://schema.pearson.com/context/schema-org-context.jsonld</xpf:string>
+    <xpf:string>https://schema.pearson.com/context/rdf-schema-context.jsonld</xpf:string>
+    <xpf:string>https://schema.pearson.com/context/assessment-context.jsonld</xpf:string>
+    <xpf:string>https://schema.pearson.com/context/content-context.jsonld</xpf:string>
+    <xpf:string>https://schema.pearson.com/context/learn-context.jsonld</xpf:string>
+    <xpf:string>https://schema.pearson.com/context/xkos-context.jsonld</xpf:string>
+    <xpf:string>https://schema.pearson.com/context/raf-context.jsonld</xpf:string>
+    <xpf:string>https://schema.pearson.com/context/skos-context.jsonld</xpf:string>
+    <xpf:string>https://schema.pearson.com/context/owl-context.jsonld</xpf:string>
+</xpf:array>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<types>
+    <type short="VideoObject">http://schema.org/VideoObject</type>
+    <type short="AudioObject">http://schema.org/AudioObject</type>
+    <type short="ImageObject">http://schema.org/ImageObject</type>
+    <type short="NarrativeText">http://schema.pearson.com/ns/content/NarrativeText</type>
+    <type short="AssessmentItem">http://schema.pearson.com/ns/assessment/AssessmentItem</type>
+</types>

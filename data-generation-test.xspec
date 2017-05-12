@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<x:description xmlns:x="http://www.jenitennison.com/xslt/xspec"
+    xmlns:xpf="http://www.w3.org/2005/xpath-functions"
+    stylesheet="c1-data-generation.xsl">
+
+    <x:scenario label="When processing a documents element">
+        <x:context>
+            <documents/>
+        </x:context>
+        <x:expect label="It should produce an xpf:map element">
+            <xpf:map>...</xpf:map>
+        </x:expect>
+    </x:scenario>
+    
+    <x:scenario label="When supplying an ImageObject and an index value of 1">
+        <x:call template="getFormat">
+            <x:param name="types">
+                <xpf:array key="type">
+                    <xpf:string>Work</xpf:string>
+                    <xpf:string>ImageObject</xpf:string>           
+                </xpf:array>
+            </x:param>
+            <x:param name="formatIndex">1</x:param>
+        </x:call>
+        <x:expect label="It should return a media type of image/tiff in an xpf:string with a format key">
+            <xpf:string key="format">image/tiff</xpf:string>
+        </x:expect>
+    </x:scenario>
+
+    <x:scenario label="When generating a date with certain input values that are double digits">
+        <x:call template="getDateCreated">
+            <x:param name="day">21</x:param>
+            <x:param name="month">11</x:param>
+            <x:param name="hour">14</x:param>
+            <x:param name="minute">45</x:param>
+        </x:call>
+        <x:expect label="It should return a media type of image/tiff in an xpf:string element with a dateCreated key">
+            <xpf:string key="dateCreated">2016-11-21T14:45:00Z</xpf:string>
+        </x:expect>
+    </x:scenario>
+
+    <x:scenario label="When generating a date with certain input values that are not double digits">
+        <x:call template="getDateCreated">
+            <x:param name="day">21</x:param>
+            <x:param name="month">5</x:param>
+            <x:param name="hour">3</x:param>
+            <x:param name="minute">45</x:param>
+        </x:call>
+        <x:expect label="It should return a media type of image/tiff in an xpf:string element with a dateCreated key">
+            <xpf:string key="dateCreated">2016-05-21T03:45:00Z</xpf:string>
+        </x:expect>
+    </x:scenario>
+    
+</x:description>
