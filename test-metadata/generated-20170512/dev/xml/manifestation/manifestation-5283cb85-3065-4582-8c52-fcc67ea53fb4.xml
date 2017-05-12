@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xpf:map xmlns:xpf="http://www.w3.org/2005/xpath-functions"
+         xmlns:jld="https://example.com"
+         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:uuid="java:java.util.UUID"
+         xmlns:rd="http://exslt.org/random"
+         xmlns:c1="http://schema.pearson.com/ns/c1">
+   <xpf:array key="@context">
+      <xpf:string>https://schema.pearson.com/context/terms-context.jsonld</xpf:string>
+      <xpf:string>https://schema.pearson.com/context/xowl-context.jsonld</xpf:string>
+      <xpf:string>https://schema.pearson.com/context/schema-org-context.jsonld</xpf:string>
+      <xpf:string>https://schema.pearson.com/context/rdf-schema-context.jsonld</xpf:string>
+      <xpf:string>https://schema.pearson.com/context/assessment-context.jsonld</xpf:string>
+      <xpf:string>https://schema.pearson.com/context/content-context.jsonld</xpf:string>
+      <xpf:string>https://schema.pearson.com/context/learn-context.jsonld</xpf:string>
+      <xpf:string>https://schema.pearson.com/context/xkos-context.jsonld</xpf:string>
+      <xpf:string>https://schema.pearson.com/context/raf-context.jsonld</xpf:string>
+      <xpf:string>https://schema.pearson.com/context/skos-context.jsonld</xpf:string>
+      <xpf:string>https://schema.pearson.com/context/owl-context.jsonld</xpf:string>
+   </xpf:array>
+   <xpf:array key="type">
+      <xpf:string>Manifestation</xpf:string>
+      <xpf:string>AudioObject</xpf:string>
+   </xpf:array>
+   <xpf:string key="id">urn:pearson:manifestation:5283cb85-3065-4582-8c52-fcc67ea53fb4</xpf:string>
+   <xpf:map key="name">
+      <xpf:string key="en">The Important refrigerator</xpf:string>
+   </xpf:map>
+   <xpf:string key="exampleOfWork">urn:pearson:work:3c99d5f3-4885-4985-8c57-d411a6a23403</xpf:string>
+   <xpf:string key="dateCreated">2016-04-09T07:18:00Z</xpf:string>
+   <xpf:string key="format">audio/wave</xpf:string>
+</xpf:map>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xpf:map xmlns:xpf="http://www.w3.org/2005/xpath-functions"
+         xmlns:jld="https://example.com"
+         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:uuid="java:java.util.UUID"
+         xmlns:rd="http://exslt.org/random"
+         xmlns:c1="http://schema.pearson.com/ns/c1">
+   <xpf:array key="@context">
+      <xpf:string>https://schema.pearson.com/context/terms-context.jsonld</xpf:string>
+      <xpf:string>https://schema.pearson.com/context/xowl-context.jsonld</xpf:string>
+      <xpf:string>https://schema.pearson.com/context/schema-org-context.jsonld</xpf:string>
+      <xpf:string>https://schema.pearson.com/context/rdf-schema-context.jsonld</xpf:string>
+      <xpf:string>https://schema.pearson.com/context/assessment-context.jsonld</xpf:string>
+      <xpf:string>https://schema.pearson.com/context/content-context.jsonld</xpf:string>
+      <xpf:string>https://schema.pearson.com/context/learn-context.jsonld</xpf:string>
+      <xpf:string>https://schema.pearson.com/context/xkos-context.jsonld</xpf:string>
+      <xpf:string>https://schema.pearson.com/context/raf-context.jsonld</xpf:string>
+      <xpf:string>https://schema.pearson.com/context/skos-context.jsonld</xpf:string>
+      <xpf:string>https://schema.pearson.com/context/owl-context.jsonld</xpf:string>
+   </xpf:array>
+   <xpf:array key="type">
+      <xpf:string>Work</xpf:string>
+      <xpf:string>NarrativeText</xpf:string>
+   </xpf:array>
+   <xpf:string key="id">urn:pearson:work:2bccdd91-0f0c-4fbc-8cf3-83d09078b15d</xpf:string>
+   <xpf:map key="name">
+      <xpf:string key="en">The Long plenty</xpf:string>
+   </xpf:map>
+   <xpf:array key="workExample">
+      <xpf:string>urn:pearson:manifestation:7a92d2fd-7ed6-441d-a620-9a75e4f190b6</xpf:string>
+      <xpf:string>urn:pearson:manifestation:dd30a49f-54a6-424e-850a-fa6c475e768e</xpf:string>
+      <xpf:string>urn:pearson:manifestation:3a5a387a-e5ad-4913-8790-12a9b99309b2</xpf:string>
+      <xpf:string>urn:pearson:manifestation:d70b87ed-aa06-4b71-aa92-86f67a54208f</xpf:string>
+   </xpf:array>
+   <xpf:string key="dateCreated">2016-10-22T18:45:00Z</xpf:string>
+   <xpf:map key="keyword">
+      <xpf:array key="en">
+         <xpf:string>trouble</xpf:string>
+         <xpf:string>law</xpf:string>
+         <xpf:string>nothing</xpf:string>
+      </xpf:array>
+   </xpf:map>
+   <xpf:array key="subject">
+      <xpf:string>https://schema.pearson.com/ns/subject/re-reading-text</xpf:string>
+      <xpf:string>https://schema.pearson.com/ns/subject/equivalent-ratio</xpf:string>
+      <xpf:string>https://schema.pearson.com/ns/subject/hectare</xpf:string>
+   </xpf:array>
+</xpf:map>

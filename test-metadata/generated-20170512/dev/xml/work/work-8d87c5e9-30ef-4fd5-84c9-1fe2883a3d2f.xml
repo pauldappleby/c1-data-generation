@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xpf:map xmlns:xpf="http://www.w3.org/2005/xpath-functions"
+         xmlns:jld="https://example.com"
+         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:uuid="java:java.util.UUID"
+         xmlns:rd="http://exslt.org/random"
+         xmlns:c1="http://schema.pearson.com/ns/c1">
+   <xpf:array key="@context">
+      <xpf:string>https://schema.pearson.com/context/terms-context.jsonld</xpf:string>
+      <xpf:string>https://schema.pearson.com/context/xowl-context.jsonld</xpf:string>
+      <xpf:string>https://schema.pearson.com/context/schema-org-context.jsonld</xpf:string>
+      <xpf:string>https://schema.pearson.com/context/rdf-schema-context.jsonld</xpf:string>
+      <xpf:string>https://schema.pearson.com/context/assessment-context.jsonld</xpf:string>
+      <xpf:string>https://schema.pearson.com/context/content-context.jsonld</xpf:string>
+      <xpf:string>https://schema.pearson.com/context/learn-context.jsonld</xpf:string>
+      <xpf:string>https://schema.pearson.com/context/xkos-context.jsonld</xpf:string>
+      <xpf:string>https://schema.pearson.com/context/raf-context.jsonld</xpf:string>
+      <xpf:string>https://schema.pearson.com/context/skos-context.jsonld</xpf:string>
+      <xpf:string>https://schema.pearson.com/context/owl-context.jsonld</xpf:string>
+   </xpf:array>
+   <xpf:array key="type">
+      <xpf:string>Work</xpf:string>
+      <xpf:string>NarrativeText</xpf:string>
+   </xpf:array>
+   <xpf:string key="id">urn:pearson:work:8d87c5e9-30ef-4fd5-84c9-1fe2883a3d2f</xpf:string>
+   <xpf:map key="name">
+      <xpf:string key="en">The Small mother</xpf:string>
+   </xpf:map>
+   <xpf:array key="workExample">
+      <xpf:string>urn:pearson:manifestation:70f22849-44f7-4e82-91c1-d3a08b110610</xpf:string>
+      <xpf:string>urn:pearson:manifestation:99c6b340-a6f3-4b45-80d4-0f9c6b13d594</xpf:string>
+      <xpf:string>urn:pearson:manifestation:8e117156-b079-4ce7-8857-59e4839a1b8d</xpf:string>
+   </xpf:array>
+   <xpf:string key="dateCreated">2016-10-22T18:46:00Z</xpf:string>
+   <xpf:map key="keyword">
+      <xpf:array key="en">
+         <xpf:string>master</xpf:string>
+         <xpf:string>tree</xpf:string>
+         <xpf:string>blank</xpf:string>
+      </xpf:array>
+   </xpf:map>
+   <xpf:array key="subject">
+      <xpf:string>https://schema.pearson.com/ns/subject/range-of-values</xpf:string>
+      <xpf:string>https://schema.pearson.com/ns/subject/sequencing-time</xpf:string>
+      <xpf:string>https://schema.pearson.com/ns/subject/common-multiple</xpf:string>
+   </xpf:array>
+</xpf:map>

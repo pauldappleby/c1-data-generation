@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xpf:map xmlns:xpf="http://www.w3.org/2005/xpath-functions"
+         xmlns:jld="https://example.com"
+         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:uuid="java:java.util.UUID"
+         xmlns:rd="http://exslt.org/random"
+         xmlns:c1="http://schema.pearson.com/ns/c1">
+   <xpf:array key="@context">
+      <xpf:string>https://schema.pearson.com/context/terms-context.jsonld</xpf:string>
+      <xpf:string>https://schema.pearson.com/context/xowl-context.jsonld</xpf:string>
+      <xpf:string>https://schema.pearson.com/context/schema-org-context.jsonld</xpf:string>
+      <xpf:string>https://schema.pearson.com/context/rdf-schema-context.jsonld</xpf:string>
+      <xpf:string>https://schema.pearson.com/context/assessment-context.jsonld</xpf:string>
+      <xpf:string>https://schema.pearson.com/context/content-context.jsonld</xpf:string>
+      <xpf:string>https://schema.pearson.com/context/learn-context.jsonld</xpf:string>
+      <xpf:string>https://schema.pearson.com/context/xkos-context.jsonld</xpf:string>
+      <xpf:string>https://schema.pearson.com/context/raf-context.jsonld</xpf:string>
+      <xpf:string>https://schema.pearson.com/context/skos-context.jsonld</xpf:string>
+      <xpf:string>https://schema.pearson.com/context/owl-context.jsonld</xpf:string>
+   </xpf:array>
+   <xpf:array key="type">
+      <xpf:string>Manifestation</xpf:string>
+      <xpf:string>AssessmentItem</xpf:string>
+   </xpf:array>
+   <xpf:string key="id">urn:pearson:manifestation:5fb61608-1e93-4cea-b5c1-ea9ac221d76c</xpf:string>
+   <xpf:map key="name">
+      <xpf:string key="en">The Tall layer</xpf:string>
+   </xpf:map>
+   <xpf:string key="exampleOfWork">urn:pearson:work:891cc58c-179f-4e2b-aef5-3e001384d57f</xpf:string>
+   <xpf:string key="dateCreated">2016-11-25T20:52:00Z</xpf:string>
+</xpf:map>
