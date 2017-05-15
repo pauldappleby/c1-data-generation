@@ -24,8 +24,8 @@
         <xsl:param name="documentType"/>
         <xsl:param name="documentUuid"/>
         <xsl:param name="documentContent"/>
-        <xsl:param name="outputFolder" select="'generated-data'"/>
-        <xsl:param name="env" select="'dev'"/>
+        <xsl:param name="outputFolder" required="yes"/>
+        <xsl:param name="env" required="yes"/>
         <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
             '[Y0001][M01][D01]')}/{$env}/xml/{lower-case($documentType)}/{lower-case($documentType)}-{$documentUuid}.xml">
             <xpf:map>
@@ -48,7 +48,7 @@
     
     <xsl:template name="getType">
         <xsl:param name="baseType"/>
-        <xsl:param name="isContainer" as="xs:boolean">false</xsl:param>
+        <xsl:param name="extendedTypes" as="xs:string*"/>
         <xsl:variable name="usableTypes" select="$type/type"/>
         <xsl:variable name="additionalType" select="for $num in rd:random-sequence(1) return
             xs:integer(floor($num * count($usableTypes)) + 1)"/>
@@ -59,9 +59,9 @@
             <xpf:string>
                 <xsl:value-of select="$usableTypes[$additionalType]/@short"/>
             </xpf:string>
-            <xsl:if test="$isContainer">
-                <xpf:string>Container</xpf:string>           
-            </xsl:if>
+            <xsl:for-each select="$extendedTypes">
+                <xpf:string><xsl:value-of select="."/></xpf:string>
+            </xsl:for-each>
         </xpf:array>
     </xsl:template>
    
@@ -102,7 +102,7 @@
     </xsl:template>
 
     <xsl:template name="getKeywords">
-        <xsl:variable name="keysCount" select="xs:integer(floor(rd:random-sequence(1) * 5))"/>
+        <xsl:param name="keysCount" as="xs:integer?"/>
         <xsl:if test="$keysCount > 0">
             <xsl:variable name="keys" select="
                 for $num in rd:random-sequence($keysCount)
@@ -121,7 +121,7 @@
     </xsl:template>
 
     <xsl:template name="getSubjects">
-        <xsl:variable name="subjectCount" select="xs:integer(floor(rd:random-sequence(1) * 5))"/>
+        <xsl:param name="subjectCount" as="xs:integer?"/>
         <xsl:if test="$subjectCount > 0">
             <xsl:variable name="subject" select="
                 for $num in rd:random-sequence($subjectCount)

@@ -49,6 +49,42 @@
         <x:expect label="It should return a media type of image/tiff in an xpf:string element with a dateCreated key">
             <xpf:string key="dateCreated">2016-05-21T03:45:00Z</xpf:string>
         </x:expect>
-    </x:scenario>
+    </x:scenario>    
+    
+    <x:scenario label="When generating a document if a shortName relationship is defined on a relation">
+        <x:context select="/document" mode="AddRelationships">
+            <document type="WorkContainer" uuid="6604a040-06e6-4720-9844-fb327ec23670"
+                urn="urn:pearson:work:6604a040-06e6-4720-9844-fb327ec23670">
+                <relation IRI="http://schema.org/hasPart" shortName="hasPart"
+                    reverseIRI="http://schema.org/isPartOf" reverseShortName="isPartOf">
+                    <document type="Work" uuid="8788ba57-67da-4e67-a478-9c5338e3375a"
+                        urn="urn:pearson:work:8788ba57-67da-4e67-a478-9c5338e3375a"/>
+                </relation>
+            </document>
+        </x:context>
+        <x:expect label="It should return an XML fragment containing that relationship">
+            <xpf:array key="hasPart">
+                <xpf:string>urn:pearson:work:8788ba57-67da-4e67-a478-9c5338e3375a</xpf:string>
+            </xpf:array>
+        </x:expect>
+    </x:scenario>    
+    
+    <x:scenario label="When generating a document if a reverseShortName relationship is defined on a relation">
+        <x:context select="/document/relation" mode="AddReverseRelationships">
+            <document type="WorkContainer" uuid="6604a040-06e6-4720-9844-fb327ec23670"
+                urn="urn:pearson:work:6604a040-06e6-4720-9844-fb327ec23670">
+                <relation IRI="http://schema.org/hasPart" shortName="hasPart"
+                    reverseIRI="http://schema.org/isPartOf" reverseShortName="isPartOf">
+                    <document type="Work" uuid="8788ba57-67da-4e67-a478-9c5338e3375a"
+                        urn="urn:pearson:work:8788ba57-67da-4e67-a478-9c5338e3375a"/>
+                </relation>
+            </document>
+        </x:context>
+        <x:expect label="It should return an XML fragment containing that relationship">
+            <xpf:array key="isPartOf">
+                <xpf:string>urn:pearson:work:6604a040-06e6-4720-9844-fb327ec23670</xpf:string>
+            </xpf:array>
+        </x:expect>
+    </x:scenario>    
     
 </x:description>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<x:description xmlns:x="http://www.jenitennison.com/xslt/xspec"
+    xmlns:xpf="http://www.w3.org/2005/xpath-functions"
+    stylesheet="c1-data-generation-content.xsl">
+
+    <x:scenario label="When generating a Work with no keywords or subjects">
+        <x:context>
+            <document type="Work"
+                uuid="dc47c459-7d3d-4cf7-b093-437f27b3284d"
+                urn="urn:pearson:work:dc47c459-7d3d-4cf7-b093-437f27b3284d"/>
+            <x:param name="keywordCount">0</x:param>
+            <x:param name="subjectCount">0</x:param>
+        </x:context>
+        <x:expect label="It should return an XML document">
+            <xpf:map>
+                <xpf:array key="type">
+                    <xpf:string>Work</xpf:string>
+                    <xpf:string>...</xpf:string>
+                </xpf:array>
+                <xpf:string key="id">urn:pearson:work:dc47c459-7d3d-4cf7-b093-437f27b3284d</xpf:string>
+                <xpf:map key="name">
+                    <xpf:string key="en">...</xpf:string>
+                </xpf:map>
+                <xpf:string key="dateCreated">...</xpf:string>
+            </xpf:map>
+        </x:expect>
+    </x:scenario>    
+
+
+    <x:scenario label="When generating a Work with keywords and subjects">
+        <x:context>
+            <document type="Work"
+                uuid="dc47c459-7d3d-4cf7-b093-437f27b3284d"
+                urn="urn:pearson:work:dc47c459-7d3d-4cf7-b093-437f27b3284d"/>
+            <x:param name="keywordCount">1</x:param>
+            <x:param name="subjectCount">1</x:param>
+        </x:context>
+        <x:expect label="It should return an XML document">
+            <xpf:map>
+                <xpf:array key="type">
+                    <xpf:string>Work</xpf:string>
+                    <xpf:string>...</xpf:string>
+                </xpf:array>
+                <xpf:string key="id">urn:pearson:work:dc47c459-7d3d-4cf7-b093-437f27b3284d</xpf:string>
+                <xpf:map key="name">
+                    <xpf:string key="en">...</xpf:string>
+                </xpf:map>
+                <xpf:string key="dateCreated">...</xpf:string>
+                <xpf:map key="keyword">
+                    <xpf:array key="en">
+                        <xpf:string>...</xpf:string>
+                    </xpf:array>
+                </xpf:map>
+                <xpf:array key="subject">
+                    <xpf:string>...</xpf:string>
+                </xpf:array>
+            </xpf:map>
+        </x:expect>
+    </x:scenario>    
+    
+    <x:scenario label="When generating a Manifestation">
+        <x:context>
+            <document type="Manifestation"
+                uuid="1b367165-2f72-4091-bf5a-1838e3bb26ad"
+                urn="urn:pearson:manifestation:1b367165-2f72-4091-bf5a-1838e3bb26ad"/>
+        </x:context>
+        <x:expect label="It should return an XML document">
+            <xpf:map>
+                <xpf:array key="type">
+                    <xpf:string>Manifestation</xpf:string>
+                    <xpf:string>...</xpf:string>
+                </xpf:array>
+                <xpf:string key="id">urn:pearson:manifestation:1b367165-2f72-4091-bf5a-1838e3bb26ad</xpf:string>
+                <xpf:map key="name">
+                    <xpf:string key="en">...</xpf:string>
+                </xpf:map>
+                <xpf:string key="dateCreated">...</xpf:string>
+                <xpf:string key="format">...</xpf:string>
+            </xpf:map>
+        </x:expect>
+    </x:scenario>    
+        
+</x:description>
