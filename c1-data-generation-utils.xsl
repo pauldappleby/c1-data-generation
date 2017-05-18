@@ -31,24 +31,27 @@
         <xsl:param name="documentContent"/>
         <xsl:param name="outputFolder" required="yes"/>
         <xsl:param name="env" required="yes"/>
-        <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
-            '[Y0001][M01][D01]')}/{$env}/xml/{if ($testSet) then concat($testSet, '/') else ()}{lower-case($documentType)}/{lower-case($documentType)}-{$documentUuid}.xml">
-            <xpf:map>
-                <xsl:copy-of select="$context"/>
-                <xsl:copy-of select="$documentContent/*"/>
-            </xpf:map>
-        </xsl:result-document>        
-        <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
-            '[Y0001][M01][D01]')}/{$env}/json/{if ($testSet) then concat($testSet, '/') else ()}{lower-case($documentType)}/{lower-case($documentType)}-{$documentUuid}.json" method="text">
-            <xsl:call-template name="jld:XML-to-JSON">
-                <xsl:with-param name="XMLinput">
-                    <xpf:map>
-                        <xsl:copy-of select="$context"/>
-                        <xsl:copy-of select="$documentContent/*"/>
-                    </xpf:map>
-                </xsl:with-param>
-            </xsl:call-template>
-        </xsl:result-document>        
+        <xsl:for-each select="tokenize($testSet, ' ')">
+            <xsl:variable name="set" select="."/>
+            <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
+                '[Y0001][M01][D01]')}/{$env}/xml/{$set}/{lower-case($documentType)}/{lower-case($documentType)}-{$documentUuid}.xml">
+                <xpf:map>
+                    <xsl:copy-of select="$context"/>
+                    <xsl:copy-of select="$documentContent/*"/>
+                </xpf:map>
+            </xsl:result-document>        
+            <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
+                '[Y0001][M01][D01]')}/{$env}/json/{$set}/{lower-case($documentType)}/{lower-case($documentType)}-{$documentUuid}.json" method="text">
+                <xsl:call-template name="jld:XML-to-JSON">
+                    <xsl:with-param name="XMLinput">
+                        <xpf:map>
+                            <xsl:copy-of select="$context"/>
+                            <xsl:copy-of select="$documentContent/*"/>
+                        </xpf:map>
+                    </xsl:with-param>
+                </xsl:call-template>
+            </xsl:result-document>
+        </xsl:for-each>
     </xsl:template>
     
     <xsl:template name="getType">

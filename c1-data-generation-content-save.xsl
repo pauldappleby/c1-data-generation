@@ -10,7 +10,7 @@
     xmlns:rd="http://exslt.org/random"
     xmlns:c1="http://schema.pearson.com/ns/c1">    
 
-    <xsl:template match="document[@type = ('LearningObjective', 'IdentifierAxiom', 'Manifestation', 'Work', 'WorkContainer')]" priority="100">
+    <xsl:template match="document[@type = ('LearningObjective', 'MatchAxiom', 'IdentifierAxiom', 'Manifestation', 'Work', 'WorkContainer')]" priority="100">
         <xsl:param name="outputFolder" tunnel="yes"/>
         <xsl:param name="env" tunnel="yes"/>
         <xsl:variable name="documentContent" as="element()">

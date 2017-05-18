@@ -40,8 +40,9 @@
     </xsl:template>
 
     <xsl:template match="document[@type = 'Work']">
-        <xsl:param name="keywordCount" select="xs:integer(floor(rd:random-sequence(1) * 5))" as="xs:integer?"/>
-        <xsl:param name="subjectCount" select="xs:integer(floor(rd:random-sequence(1) * 5))" as="xs:integer?"/>
+        <xsl:param name="randomNumbers" select="rd:random-sequence(2)"/>
+        <xsl:param name="keywordCount" select="xs:integer(floor($randomNumbers[1] * 5))" as="xs:integer?"/>
+        <xsl:param name="subjectCount" select="xs:integer(floor($randomNumbers[2] * 5))" as="xs:integer?"/>
         <xpf:map>
             <xsl:call-template name="getType">
                 <xsl:with-param name="baseType">Work</xsl:with-param>
@@ -105,6 +106,27 @@
         </xpf:map>
     </xsl:template>
 
+    <xsl:template match="document[@type = 'MatchAxiom']">
+        <xpf:map>
+            <xpf:array key="type">
+                <xpf:string>MatchAxiom</xpf:string>
+            </xpf:array>
+            <xpf:string key="id">
+                <xsl:value-of select="@urn"/>
+            </xpf:string>
+            <xsl:variable name="set" select="@testSet"/>
+            <xsl:variable name="learningObjectives" select="//document[contains(@testSet, $set) and @type = 'LearningObjective']"/>
+            <xsl:variable name="randomNumbers" select="rd:random-sequence(2)"/>
+            <xsl:variable name="subjectLOindex" select="xs:integer($randomNumbers[1] * count($learningObjectives) + 1)" as="xs:integer?"/>
+            <xsl:variable name="targetLOindex" select="xs:integer($randomNumbers[2] * count($learningObjectives) + 1)" as="xs:integer?"/>
+            <xsl:variable name="subjectLO" select="$learningObjectives[$subjectLOindex]/@urn"/>                    
+            <xsl:variable name="targetLO" select="$learningObjectives[$targetLOindex]/@urn"/>                    
+            <xpf:string key="matchType">http://www.w3.org/2004/02/skos/core#exactMatch</xpf:string>
+            <xpf:string key="matchSubject"><xsl:value-of select="$subjectLO"/></xpf:string>
+            <xpf:string key="matchTarget"><xsl:value-of select="$targetLO"/></xpf:string>
+        </xpf:map>
+    </xsl:template>
+    
     <xsl:template match="document[@type = 'LearningObjective']">
         <xpf:map>
             <xpf:array key="type">

@@ -80,4 +80,62 @@
         </x:expect>
     </x:scenario>    
         
+    <x:scenario label="When generating an IdentifierAxiom">
+        <x:context>
+            <document testSet="seedData" type="IdentifierAxiom"
+                uuid="f1b43451-2942-415d-b036-3392aaf0fb42"
+                urn="urn:pearson:identifier:f1b43451-2942-415d-b036-3392aaf0fb42"/>
+        </x:context>
+        <x:expect label="It should return an XML document">
+            <xpf:map>
+                <xpf:array key="type">
+                    <xpf:string>IdentifierAxiom</xpf:string>
+                </xpf:array>
+                <xpf:string key="id">urn:pearson:identifier:f1b43451-2942-415d-b036-3392aaf0fb42</xpf:string>
+                <xpf:string key="idTerm">https://schema.pearson.com/ns/system/epsID</xpf:string>
+                <xpf:string key="idValue">...</xpf:string>
+            </xpf:map>
+        </x:expect>
+    </x:scenario>    
+
+    <x:scenario label="When generating an MatchAxiom">
+        <x:context>
+            <document testSet="seedData" type="IdentifierAxiom"
+                uuid="f1b43451-2942-415d-b036-3392aaf0fb42"
+                urn="urn:pearson:identifier:f1b43451-2942-415d-b036-3392aaf0fb42"/>
+        </x:context>
+        <x:expect label="It should return an XML document">
+            <xpf:map>
+                <xpf:array key="type">
+                    <xpf:string>IdentifierAxiom</xpf:string>
+                </xpf:array>
+                <xpf:string key="id">urn:pearson:identifier:f1b43451-2942-415d-b036-3392aaf0fb42</xpf:string>
+                <xpf:string key="idTerm">https://schema.pearson.com/ns/system/epsID</xpf:string>
+                <xpf:string key="idValue">...</xpf:string>
+            </xpf:map>
+        </x:expect>
+    </x:scenario>    
+    
+    <x:scenario label="When generating an LearningObjective">
+        <x:context>
+            <document testSet="performanceData" type="LearningObjective"
+                uuid="61b9f4c5-4570-4c18-b23b-bc0021c0093d"
+                urn="urn:pearson:educationalgoal:61b9f4c5-4570-4c18-b23b-bc0021c0093d"/>
+        </x:context>
+        <x:expect label="It should return an XML document">
+            <xpf:map>
+                <xpf:array key="type">
+                    <xpf:string>LearningObjective</xpf:string>
+                </xpf:array>
+                <xpf:string key="id">urn:pearson:educationalgoal:61b9f4c5-4570-4c18-b23b-bc0021c0093d</xpf:string>
+                <xpf:map key="description">
+                    <xpf:string key="en">...</xpf:string>
+                </xpf:map>
+                <xpf:array key="learningDimension">
+                    <xpf:string>...</xpf:string>
+                </xpf:array>
+            </xpf:map>
+        </x:expect>
+    </x:scenario>    
+    
 </x:description>
