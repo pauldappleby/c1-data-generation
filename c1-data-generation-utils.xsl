@@ -19,22 +19,27 @@
     <xsl:variable name="type" select="document('seed-data/types.xml')/types"/>
     <xsl:variable name="formats" select="document('seed-data/formats.xml')/formats"/>
     <xsl:variable name="keywords" select="$words/(adjectives | nouns)/*"/>
+    <!-- This data comes from a sample using the migrated CMT data -->
+    <xsl:variable name="learningObjectiveDescription" select="tokenize(unparsed-text('seed-data/learning-objective.txt'), '&#13;&#10;')" as="xs:string+"/>   
+    <!-- This data comes from a sample using the migrated CMT data -->
+    <xsl:variable name="learningDimension" select="tokenize(unparsed-text('seed-data/learning-dimension.txt'), '&#13;&#10;')" as="xs:string+"/>   
     
     <xsl:template name="saveDocument">
+        <xsl:param name="testSet"/>
         <xsl:param name="documentType"/>
         <xsl:param name="documentUuid"/>
         <xsl:param name="documentContent"/>
         <xsl:param name="outputFolder" required="yes"/>
         <xsl:param name="env" required="yes"/>
         <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
-            '[Y0001][M01][D01]')}/{$env}/xml/{lower-case($documentType)}/{lower-case($documentType)}-{$documentUuid}.xml">
+            '[Y0001][M01][D01]')}/{$env}/xml/{if ($testSet) then concat($testSet, '/') else ()}{lower-case($documentType)}/{lower-case($documentType)}-{$documentUuid}.xml">
             <xpf:map>
                 <xsl:copy-of select="$context"/>
                 <xsl:copy-of select="$documentContent/*"/>
             </xpf:map>
         </xsl:result-document>        
         <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
-            '[Y0001][M01][D01]')}/{$env}/json/{lower-case($documentType)}/{lower-case($documentType)}-{$documentUuid}.json" method="text">
+            '[Y0001][M01][D01]')}/{$env}/json/{if ($testSet) then concat($testSet, '/') else ()}{lower-case($documentType)}/{lower-case($documentType)}-{$documentUuid}.json" method="text">
             <xsl:call-template name="jld:XML-to-JSON">
                 <xsl:with-param name="XMLinput">
                     <xpf:map>
@@ -120,6 +125,30 @@
         </xsl:if>
     </xsl:template>
 
+    <xsl:template name="getLearningObjectiveDescription">
+        <xsl:variable name="descriptionIndex" select="
+            for $num in rd:random-sequence(1)
+            return
+            xs:integer(floor($num * count($learningObjectiveDescription)))"/>
+        <xpf:map key="description">
+            <xpf:string key="en">
+                <xsl:value-of select="$learningObjectiveDescription[$descriptionIndex]"/>
+            </xpf:string>
+        </xpf:map>
+    </xsl:template>
+
+    <xsl:template name="getLearningDimension">
+        <xsl:variable name="dimensionIndex" select="
+            for $num in rd:random-sequence(1)
+            return
+            xs:integer(floor($num * count($learningDimension)))"/>
+        <xpf:array key="learningDimension">
+            <xpf:string>
+                <xsl:value-of select="$learningDimension[$dimensionIndex]"/>
+            </xpf:string>
+        </xpf:array>
+    </xsl:template>
+    
     <xsl:template name="getSubjects">
         <xsl:param name="subjectCount" as="xs:integer?"/>
         <xsl:if test="$subjectCount > 0">
@@ -152,8 +181,8 @@
         </xsl:if>
     </xsl:template>
     
-    <xsl:function name="c1:getUUID" as="xs:string">
+    <!--<xsl:function name="c1:getUUID" as="xs:string">
         <xsl:value-of select="uuid:randomUUID()"/>
-    </xsl:function>
+    </xsl:function>-->
     
 </xsl:stylesheet>

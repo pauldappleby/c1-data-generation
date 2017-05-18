@@ -20,8 +20,15 @@
     
     <xsl:param name="numWorks">10</xsl:param>
     <xsl:param name="numWorkContainers">10</xsl:param>
+
+    <xsl:param name="numPerfLearningObjectives">10</xsl:param>
+    <xsl:param name="numPerfTestIdentifierAxioms">10</xsl:param>
+
     <xsl:param name="env">dev</xsl:param>
     <xsl:param name="outputFolder">generated-data</xsl:param>
+    
+    <xsl:param name="numWorksSeed">5987907735</xsl:param>
+    <xsl:param name="identifierSeed">7537059247</xsl:param>
                
     <xsl:template name="generateOutput">
         
@@ -31,36 +38,61 @@
  
                 <xsl:variable name="hasPartCounts" select="rd:random-sequence($numWorkContainers)"/>
                 <xsl:for-each select="1 to $numWorkContainers">
-                    <xsl:variable name="uuid" select="c1:getUUID()"/>
+                    <xsl:variable name="uuid" select="uuid:randomUUID()"/>
                     <xsl:variable name="hasPartIndex" select="position()"/>
                     <xsl:variable name="hasPartCount" select="xs:integer(floor($hasPartCounts[$hasPartIndex] * 5) + 1)" as="xs:integer"/>
-                    <document type="WorkContainer" uuid="{$uuid}" urn="urn:pearson:work:{$uuid}">
-                        <relation IRI="http://schema.org/hasPart" shortName="hasPart" reverseIRI="http://schema.org/isPartOf" reverseShortName="isPartOf">
+                    <document testSet="seedData" type="WorkContainer" uuid="{$uuid}" urn="urn:pearson:work:{$uuid}">
+                        <relation IRI="http://schema.org/hasPart" shortName="hasPart">
                             <xsl:for-each select="1 to $hasPartCount">
-                                <xsl:variable name="workUuid" select="c1:getUUID()"/>                                
-                                <document type="Work" uuid="{$workUuid}" urn="urn:pearson:work:{$workUuid}"/>
+                                <xsl:variable name="workUuid" select="uuid:randomUUID()"/>                                
+                                <document testSet="seedData" type="Work" uuid="{$workUuid}" urn="urn:pearson:work:{$workUuid}"/>
                             </xsl:for-each>
                         </relation>
                     </document>
                 </xsl:for-each>
                
-                <xsl:variable name="workManifestationCounts" select="rd:random-sequence($numWorks)"/>
+                <xsl:variable name="workManifestationCounts" select="rd:random-sequence($numWorks, $numWorksSeed)"/>
+                <!-- 20% of Manifestations will be given EPS IDs -->
+                <xsl:variable name="includeEPSidentifierValues" select="rd:random-sequence($numWorks, $identifierSeed)" as="xs:double*"/>
                 <xsl:for-each select="1 to $numWorks">
-                    <xsl:variable name="uuid" select="c1:getUUID()"/>
+                    <xsl:variable name="uuid" select="uuid:randomUUID()"/>
                     <xsl:variable name="workIndex" select="position()"/>
                     <xsl:variable name="workExampleCount" select="xs:integer(floor($workManifestationCounts[$workIndex] * 5))" as="xs:integer"/>
-                    <document type="Work" uuid="{$uuid}" urn="urn:pearson:work:{$uuid}">
-                        <relation IRI="http://schema.org/workExample" shortName="workExample" reverseIRI="http://schema.org/exampleOfWork" reverseShortName="exampleOfWork">
-                           <xsl:for-each select="1 to $workExampleCount">
-                               <xsl:variable name="manifestationUuid" select="c1:getUUID()"/>                                
-                               <document type="Manifestation" uuid="{$manifestationUuid}" urn="urn:pearson:manifestation:{$manifestationUuid}"/>
-                            </xsl:for-each>
-                        </relation>
+                    <document testSet="seedData" type="Work" uuid="{$uuid}" urn="urn:pearson:work:{$uuid}" epsValue="{$includeEPSidentifierValues[$workIndex]}">
+                        <xsl:if test="$workExampleCount > 0">
+                            <relation IRI="http://schema.org/workExample" shortName="workExample">
+                                <xsl:for-each select="1 to $workExampleCount">
+                                   <xsl:variable name="manifestationUuid" select="uuid:randomUUID()"/>                                
+                                    <document testSet="seedData" type="Manifestation" uuid="{$manifestationUuid}" urn="urn:pearson:manifestation:{$manifestationUuid}">
+                                       <xsl:if test="$includeEPSidentifierValues[$workIndex] &lt; 0.2">
+                                           <relation IRI="https://schema.pearson.com/ns/xowl/identifiedBy" shortName="identifiedBy">
+                                               <xsl:variable name="identifierAxiomUuid" select="uuid:randomUUID()"/>                                
+                                               <document testSet="seedData" type="IdentifierAxiom" uuid="{$identifierAxiomUuid}" urn="urn:pearson:identifier:{$identifierAxiomUuid}"/>
+                                           </relation>
+                                       </xsl:if>
+                                   </document>
+                                </xsl:for-each>
+                            </relation>
+                        </xsl:if>
                     </document>
                 </xsl:for-each>
 
+                <xsl:for-each select="1 to $numPerfLearningObjectives">
+                    <xsl:variable name="learningObjectiveUuid" select="uuid:randomUUID()"/>                                
+                    <document testSet="performanceData" type="LearningObjective" uuid="{$learningObjectiveUuid}" urn="urn:pearson:educationalgoal:{$learningObjectiveUuid}"/>                    
+                </xsl:for-each>
+                
+                <xsl:for-each select="1 to $numPerfTestIdentifierAxioms">
+                    <xsl:variable name="identifierAxiomUuid" select="uuid:randomUUID()"/>                                
+                    <document testSet="performanceData" type="IdentifierAxiom" uuid="{$identifierAxiomUuid}" urn="urn:pearson:identifier:{$identifierAxiomUuid}"/>                    
+                </xsl:for-each>
+                    
             </documents>
         </xsl:variable>
+        
+        <xsl:if test="$processingStructure//document[not(@testSet)]">
+            <xsl:message terminate="yes">Nodes are missing test sets</xsl:message>
+        </xsl:if>
         
         <xsl:apply-templates select="$processingStructure">
             <xsl:with-param name="outputFolder" tunnel="yes" select="$outputFolder"/>
@@ -73,25 +105,33 @@
         </xsl:result-document>
             
         <!-- We generate a CURL output so that all files can be loaded up automatically -->
-        <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
-            '[Y0001][M01][D01]')}/{$env}/curl-file.bat" method="text">
-            <xsl:text>md results&#10;</xsl:text>
-            <xsl:variable name="documentCount" select="count($processingStructure//document)"/>
-            <xsl:for-each select="$processingStructure//document">
-                <xsl:text>timeout 1&#10;</xsl:text>
-                <xsl:text>echo </xsl:text>
-                <xsl:value-of select="concat(position(), ' of ', $documentCount)"/>
-                <xsl:text>&#10;curl -X POST -d @json/</xsl:text>
-                <xsl:value-of select="lower-case(@type)"/>
-                <xsl:text>/</xsl:text>
-                <xsl:value-of select="lower-case(@type)"/>
-                <xsl:text>-</xsl:text>
-                <xsl:value-of select="@uuid"/>
-                <xsl:text>.json -H "Content-Type: application/json" -H "Authorization: Basic Ymx1ZWJlcnJ5OmVAQkhSTUF2M2V5S2xiT1VjS0tAWl56Q0ZhMDRtYw==" -H "X-Roles: LearningAdmin,ContentMetadataAdmin" -k https://develop-data.pearsoncms.net/api/api/thing?db=qa0 -o results/results-</xsl:text>
-                <xsl:value-of select="@uuid"/>
-                <xsl:text>.txt -i&#10;</xsl:text>
-            </xsl:for-each>
-        </xsl:result-document>   
+        <xsl:for-each select="distinct-values($processingStructure//document/@testSet)">
+            <xsl:variable name="testSet" select="."/>
+            <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
+                '[Y0001][M01][D01]')}/{$env}/{$testSet}-curl-file.bat" method="text">
+                <xsl:text>md results&#10;</xsl:text>
+                <xsl:variable name="documentCount" select="count($processingStructure//document)"/>
+                <xsl:for-each select="$processingStructure//document[@testSet = $testSet]">
+                    <!-- We do the deepest children first because they get used by ancestors -->
+                    <xsl:sort select="count(ancestor::*)" order="descending"/>
+                    <xsl:text>timeout 1&#10;</xsl:text>
+                    <xsl:text>echo </xsl:text>
+                    <xsl:value-of select="concat(position(), ' of ', $documentCount)"/>
+                    <xsl:text>&#10;curl -X POST -d @json/</xsl:text>
+                    <xsl:value-of select="if (@testSet) then concat(@testSet, '/') else ()"/>
+                    <xsl:value-of select="lower-case(@type)"/>
+                    <xsl:text>/</xsl:text>
+                    <xsl:value-of select="lower-case(@type)"/>
+                    <xsl:text>-</xsl:text>
+                    <xsl:value-of select="@uuid"/>
+                    <xsl:text>.json -H "Content-Type: application/json" -H "Authorization: Basic Ymx1ZWJlcnJ5OmVAQkhSTUF2M2V5S2xiT1VjS0tAWl56Q0ZhMDRtYw==" -H "X-Roles: LearningAdmin,ContentMetadataAdmin" -k https://develop-data.pearsoncms.net/api/api/thing?db=qa0 -o results/results-</xsl:text>
+                    <xsl:value-of select="lower-case(@type)"/>
+                    <xsl:text>-</xsl:text>
+                    <xsl:value-of select="@uuid"/>
+                    <xsl:text>.txt -i&#10;</xsl:text>
+                </xsl:for-each>
+            </xsl:result-document>  
+        </xsl:for-each>
         
     </xsl:template>
  

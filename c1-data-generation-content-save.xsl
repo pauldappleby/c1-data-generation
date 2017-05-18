@@ -10,28 +10,14 @@
     xmlns:rd="http://exslt.org/random"
     xmlns:c1="http://schema.pearson.com/ns/c1">    
 
-    <xsl:template match="document[@type = ('Manifestation')]" priority="100">
+    <xsl:template match="document[@type = ('LearningObjective', 'IdentifierAxiom', 'Manifestation', 'Work', 'WorkContainer')]" priority="100">
         <xsl:param name="outputFolder" tunnel="yes"/>
         <xsl:param name="env" tunnel="yes"/>
         <xsl:variable name="documentContent" as="element()">
             <xsl:next-match/>
         </xsl:variable>
         <xsl:call-template name="saveDocument">
-            <xsl:with-param name="documentType" select="@type"/>
-            <xsl:with-param name="documentUuid" select="@uuid"/>
-            <xsl:with-param name="documentContent" select="$documentContent"/>
-            <xsl:with-param name="outputFolder" select="$outputFolder"/>
-            <xsl:with-param name="env" select="$env"/>
-        </xsl:call-template>
-    </xsl:template>
-
-    <xsl:template match="document[@type = ('Work', 'WorkContainer')]" priority="100">
-        <xsl:param name="outputFolder" tunnel="yes"/>
-        <xsl:param name="env" tunnel="yes"/>
-        <xsl:variable name="documentContent" as="element()">
-            <xsl:next-match/>
-        </xsl:variable>
-        <xsl:call-template name="saveDocument">
+            <xsl:with-param name="testSet" select="@testSet"/>
             <xsl:with-param name="documentType" select="@type"/>
             <xsl:with-param name="documentUuid" select="@uuid"/>
             <xsl:with-param name="documentContent" select="$documentContent"/>

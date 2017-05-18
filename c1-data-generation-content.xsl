@@ -84,10 +84,37 @@
                 </xpf:string>
             </xpf:map>
             <xsl:apply-templates select="parent::relation" mode="AddReverseRelationships"/>
+            <xsl:apply-templates select="relation" mode="AddRelationships"/>
             <xsl:call-template name="getDateCreated"/>
             <xsl:call-template name="getFormat">
                 <xsl:with-param name="types" select="$getTypes"/>
             </xsl:call-template>
+        </xpf:map>
+    </xsl:template>
+
+    <xsl:template match="document[@type = 'IdentifierAxiom']">
+        <xpf:map>
+            <xpf:array key="type">
+                <xpf:string>IdentifierAxiom</xpf:string>
+            </xpf:array>
+            <xpf:string key="id">
+                <xsl:value-of select="@urn"/>
+            </xpf:string>
+            <xpf:string key="idTerm">https://schema.pearson.com/ns/system/epsID</xpf:string>
+            <xpf:string key="idValue">urn:pearson:eps:<xsl:value-of select="uuid:randomUUID()"/></xpf:string>
+        </xpf:map>
+    </xsl:template>
+
+    <xsl:template match="document[@type = 'LearningObjective']">
+        <xpf:map>
+            <xpf:array key="type">
+                <xpf:string>LearningObjective</xpf:string>
+            </xpf:array>
+            <xpf:string key="id">
+                <xsl:value-of select="@urn"/>
+            </xpf:string>
+            <xsl:call-template name="getLearningObjectiveDescription"/>
+            <xsl:call-template name="getLearningDimension"/>
         </xpf:map>
     </xsl:template>
     
