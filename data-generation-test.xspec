@@ -7,9 +7,7 @@
         <x:context>
             <documents/>
         </x:context>
-        <x:expect label="It should produce an xpf:map element">
-            <xpf:map>...</xpf:map>
-        </x:expect>
+        <x:expect label="It should produce an xpf:map element"/>
     </x:scenario>
     
     <x:scenario label="When supplying an ImageObject and an index value of 1">
@@ -23,7 +21,7 @@
             <x:param name="formatIndex">1</x:param>
         </x:call>
         <x:expect label="It should return a media type of image/tiff in an xpf:string with a format key">
-            <xpf:string key="format">image/tiff</xpf:string>
+            <xpf:string key="format" IRI="http://schema.org/fileFormat">image/tiff</xpf:string>
         </x:expect>
     </x:scenario>
 
@@ -35,7 +33,7 @@
             <x:param name="minute">45</x:param>
         </x:call>
         <x:expect label="It should return a media type of image/tiff in an xpf:string element with a dateCreated key">
-            <xpf:string key="dateCreated">2016-11-21T14:45:00Z</xpf:string>
+            <xpf:string key="dateCreated" IRI="http://schema.org/dateCreated" type="http://www.w3.org/2001/XMLSchema#dateTime">2016-11-21T14:45:00Z</xpf:string>
         </x:expect>
     </x:scenario>
 
@@ -47,7 +45,7 @@
             <x:param name="minute">45</x:param>
         </x:call>
         <x:expect label="It should return a media type of image/tiff in an xpf:string element with a dateCreated key">
-            <xpf:string key="dateCreated">2016-05-21T03:45:00Z</xpf:string>
+            <xpf:string key="dateCreated" IRI="http://schema.org/dateCreated" type="http://www.w3.org/2001/XMLSchema#dateTime">2016-05-21T03:45:00Z</xpf:string>
         </x:expect>
     </x:scenario>    
     
@@ -63,8 +61,8 @@
             </document>
         </x:context>
         <x:expect label="It should return an XML fragment containing that relationship">
-            <xpf:array key="hasPart">
-                <xpf:string>urn:pearson:work:8788ba57-67da-4e67-a478-9c5338e3375a</xpf:string>
+            <xpf:array key="hasPart" IRI="http://schema.org/hasPart">
+                <xpf:string type="IRI" IRI="http://schema.org/hasPart">urn:pearson:work:8788ba57-67da-4e67-a478-9c5338e3375a</xpf:string>
             </xpf:array>
         </x:expect>
     </x:scenario>    

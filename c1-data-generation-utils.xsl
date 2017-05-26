@@ -36,7 +36,7 @@
         <xsl:for-each select="tokenize($testSet, ' ')">
             <xsl:variable name="set" select="."/>
             <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
-                '[Y0001][M01][D01]')}/{$env}/xml/{$set}/{lower-case($documentType)}/{lower-case($documentType)}-{$documentUuid}.xml">
+                '[Y0001][M01][D01]')}/{$env}/xml/{$set}/{lower-case($documentType)}/{lower-case($documentType)}-{$documentUuid}.xml" method="xml">
                 <xpf:map>
                     <xsl:copy-of select="$context"/>
                     <xsl:copy-of select="$documentContent/*"/>
@@ -53,17 +53,14 @@
                     </xsl:with-param>
                 </xsl:call-template>
             </xsl:result-document>
-<!--            <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
-                '[Y0001][M01][D01]')}/{$env}/nquads/{$set}/{lower-case($documentType)}/{lower-case($documentType)}-{$documentUuid}.nquad" method="text">-->
-                <xsl:call-template name="jld:xml-to-quads">
-                    <xsl:with-param name="XMLinput">
-                        <xpf:map>
-                            <xsl:copy-of select="$context"/>
-                            <xsl:copy-of select="$documentContent/*"/>
-                        </xpf:map>
-                    </xsl:with-param>
-                </xsl:call-template>
-<!--            </xsl:result-document> -->
+            <xsl:call-template name="jld:xml-to-quads">
+                <xsl:with-param name="XMLinput">
+                    <xpf:map>
+                        <xsl:copy-of select="$context"/>
+                        <xsl:copy-of select="$documentContent/*"/>
+                    </xpf:map>
+                </xsl:with-param>
+            </xsl:call-template>
         </xsl:for-each>
     </xsl:template>
     
@@ -150,7 +147,7 @@
             return
             xs:integer(floor($num * count($learningObjectiveDescription)))"/>
         <xpf:map key="description" IRI="http://schema.org/description">
-            <xpf:string key="en" type="LangString" IRI="http://schema.org/description">
+            <xpf:string key="en" language="en" type="LangString" IRI="http://schema.org/description">
                 <xsl:value-of select="$learningObjectiveDescription[$descriptionIndex]"/>
             </xpf:string>
         </xpf:map>

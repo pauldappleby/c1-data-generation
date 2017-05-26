@@ -19,14 +19,14 @@
     <xsl:output method="text" indent="yes" exclude-result-prefixes="rd c1 uuid"/>
     
     <!-- Number of items to generate for seed data -->
-    <xsl:param name="numWorks">10000</xsl:param>
-    <xsl:param name="numWorkContainers">1000</xsl:param>
+    <xsl:param name="numWorks">10</xsl:param>
+    <xsl:param name="numWorkContainers">10</xsl:param>
 
     <!-- Number of items to generate for performances data -->
-    <xsl:param name="numPerfMatchAxioms">1000</xsl:param>
-    <xsl:param name="numPerfManifestations">1000</xsl:param>
-    <xsl:param name="numPerfLearningObjectives">1000</xsl:param>
-    <xsl:param name="numPerfIdentifierAxioms">1000</xsl:param>
+    <xsl:param name="numPerfMatchAxioms">10</xsl:param>
+    <xsl:param name="numPerfManifestations">10</xsl:param>
+    <xsl:param name="numPerfLearningObjectives">10</xsl:param>
+    <xsl:param name="numPerfIdentifierAxioms">10</xsl:param>
 
     <xsl:param name="env">dev</xsl:param>
     <xsl:param name="outputFolder">generated-data</xsl:param>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<x:description xmlns:x="http://www.jenitennison.com/xslt/xspec"
+    xmlns:xpf="http://www.w3.org/2005/xpath-functions"
+    stylesheet="XML-to-Quads.xsl">
+
+    <x:scenario label="When generating a language string with an @en tag">
+        <x:context mode="xml-to-quads">
+            <x:param name="resource" tunnel="yes">urn:pearson:work:12345</x:param>
+            <x:param name="graph" tunnel="yes">&lt;https://data.pearson.com/graph/work/12345&gt;</x:param>
+            <xpf:string language="en" IRI="http://schema.org/name">I am a string</xpf:string>
+        </x:context>
+        <x:expect label="It should return an Nquad">&lt;urn:pearson:work:12345&gt; &lt;http://schema.org/name&gt; "I am a string"@en &lt;https://data.pearson.com/graph/work/12345&gt; .&#10;</x:expect>
+    </x:scenario>    
+
+    <x:scenario label="When generating a non-language string">
+        <x:context mode="xml-to-quads">
+            <x:param name="resource" tunnel="yes">urn:pearson:work:12345</x:param>
+            <x:param name="graph" tunnel="yes">&lt;https://data.pearson.com/graph/work/12345&gt;</x:param>
+            <xpf:string IRI="http://schema.org/name">I am a string</xpf:string>
+        </x:context>
+        <x:expect label="It should return an Nquad">&lt;urn:pearson:work:12345&gt; &lt;http://schema.org/name&gt; "I am a string" &lt;https://data.pearson.com/graph/work/12345&gt; .&#10;</x:expect>
+    </x:scenario>    
+
+    <x:scenario label="When generating a typed string">
+        <x:context mode="xml-to-quads">
+            <x:param name="resource" tunnel="yes">urn:pearson:work:12345</x:param>
+            <x:param name="graph" tunnel="yes">&lt;https://data.pearson.com/graph/work/12345&gt;</x:param>
+            <xpf:string key="dateCreated"
+                IRI="http://schema.org/dateCreated"
+                type="http://www.w3.org/2001/XMLSchema#dateTime">2016-10-22T18:45:00Z</xpf:string>
+        </x:context>
+        <x:expect label="It should return an Nquad with a typed literal">&lt;urn:pearson:work:12345&gt; &lt;http://schema.org/dateCreated&gt; "2016-10-22T18:45:00Z"^^&lt;http://www.w3.org/2001/XMLSchema#dateTime&gt; &lt;https://data.pearson.com/graph/work/12345&gt; .&#10;</x:expect>
+    </x:scenario>    
+
+    <x:scenario label="When generating an IRI object">
+        <x:context mode="xml-to-quads">
+            <x:param name="resource" tunnel="yes">urn:pearson:work:12345</x:param>
+            <x:param name="graph" tunnel="yes">&lt;https://data.pearson.com/graph/work/12345&gt;</x:param>
+            <xpf:string type="IRI" IRI="http://purl.org/dc/terms/subject">https://schema.pearson.com/ns/subject/unit-fractions</xpf:string>
+        </x:context>
+        <x:expect label="It should return an IRI object">&lt;urn:pearson:work:12345&gt; &lt;http://purl.org/dc/terms/subject&gt; &lt;https://schema.pearson.com/ns/subject/unit-fractions&gt; &lt;https://data.pearson.com/graph/work/12345&gt; .&#10;</x:expect>
+    </x:scenario>    
+    
+</x:description>

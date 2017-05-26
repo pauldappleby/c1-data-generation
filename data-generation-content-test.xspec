@@ -13,15 +13,12 @@
         </x:context>
         <x:expect label="It should return an XML document">
             <xpf:map>
-                <xpf:array key="type">
-                    <xpf:string>Work</xpf:string>
-                    <xpf:string>...</xpf:string>
-                </xpf:array>
+                <xpf:array key="type">...</xpf:array>
                 <xpf:string key="id">urn:pearson:work:dc47c459-7d3d-4cf7-b093-437f27b3284d</xpf:string>
-                <xpf:map key="name">
-                    <xpf:string key="en">...</xpf:string>
+                <xpf:map key="name" IRI="http://schema.org/name" type="LanguageContainer">
+                    <xpf:string key="en" language="en" IRI="http://schema.org/name">...</xpf:string>
                 </xpf:map>
-                <xpf:string key="dateCreated">...</xpf:string>
+                <xpf:string key="dateCreated" IRI="http://schema.org/dateCreated" type="http://www.w3.org/2001/XMLSchema#dateTime">...</xpf:string>
             </xpf:map>
         </x:expect>
     </x:scenario>    
@@ -37,22 +34,19 @@
         </x:context>
         <x:expect label="It should return an XML document">
             <xpf:map>
-                <xpf:array key="type">
-                    <xpf:string>Work</xpf:string>
-                    <xpf:string>...</xpf:string>
-                </xpf:array>
+                <xpf:array key="type">...</xpf:array>
                 <xpf:string key="id">urn:pearson:work:dc47c459-7d3d-4cf7-b093-437f27b3284d</xpf:string>
-                <xpf:map key="name">
-                    <xpf:string key="en">...</xpf:string>
+                <xpf:map key="name" IRI="http://schema.org/name" type="LanguageContainer">
+                    <xpf:string key="en" language="en" IRI="http://schema.org/name">...</xpf:string>
                 </xpf:map>
-                <xpf:string key="dateCreated">...</xpf:string>
-                <xpf:map key="keyword">
+                <xpf:string key="dateCreated" IRI="http://schema.org/dateCreated" type="http://www.w3.org/2001/XMLSchema#dateTime">...</xpf:string>
+                <xpf:map key="keyword" IRI="http://schema.org/keyword" type="LanguageContainer">
                     <xpf:array key="en">
-                        <xpf:string>...</xpf:string>
+                        <xpf:string language="en" IRI="http://schema.org/keyword">...</xpf:string>
                     </xpf:array>
                 </xpf:map>
-                <xpf:array key="subject">
-                    <xpf:string>...</xpf:string>
+                <xpf:array key="subject" IRI="http://purl.org/dc/terms/subject">
+                    <xpf:string type="IRI" IRI="http://purl.org/dc/terms/subject">...</xpf:string>
                 </xpf:array>
             </xpf:map>
         </x:expect>
@@ -66,16 +60,13 @@
         </x:context>
         <x:expect label="It should return an XML document">
             <xpf:map>
-                <xpf:array key="type">
-                    <xpf:string>Manifestation</xpf:string>
-                    <xpf:string>...</xpf:string>
-                </xpf:array>
+                <xpf:array key="type">...</xpf:array>
                 <xpf:string key="id">urn:pearson:manifestation:1b367165-2f72-4091-bf5a-1838e3bb26ad</xpf:string>
-                <xpf:map key="name">
-                    <xpf:string key="en">...</xpf:string>
+                <xpf:map key="name" IRI="http://schema.org/name" type="LanguageContainer">
+                    <xpf:string key="en" language="en" IRI="http://schema.org/name">...</xpf:string>
                 </xpf:map>
-                <xpf:string key="dateCreated">...</xpf:string>
-                <xpf:string key="format">...</xpf:string>
+                <xpf:string key="dateCreated" IRI="http://schema.org/dateCreated" type="http://www.w3.org/2001/XMLSchema#dateTime">...</xpf:string>
+                <xpf:string key="format" IRI="http://schema.org/fileFormat">...</xpf:string>
             </xpf:map>
         </x:expect>
     </x:scenario>    
@@ -89,11 +80,11 @@
         <x:expect label="It should return an XML document">
             <xpf:map>
                 <xpf:array key="type">
-                    <xpf:string>IdentifierAxiom</xpf:string>
+                    <xpf:string IRI="https://schema.pearson.com/ns/xowl/IdentifierAxiom">IdentifierAxiom</xpf:string>
                 </xpf:array>
                 <xpf:string key="id">urn:pearson:identifier:f1b43451-2942-415d-b036-3392aaf0fb42</xpf:string>
-                <xpf:string key="idTerm">https://schema.pearson.com/ns/system/epsID</xpf:string>
-                <xpf:string key="idValue">...</xpf:string>
+                <xpf:string key="idTerm" type="IRI" IRI="https://schema.pearson.com/ns/xowl/idTerm">https://schema.pearson.com/ns/system/epsID</xpf:string>
+                <xpf:string key="idValue" type="IRI" IRI="https://schema.pearson.com/ns/xowl/idValue">...</xpf:string>
             </xpf:map>
         </x:expect>
     </x:scenario>    
@@ -107,11 +98,11 @@
         <x:expect label="It should return an XML document">
             <xpf:map>
                 <xpf:array key="type">
-                    <xpf:string>IdentifierAxiom</xpf:string>
+                    <xpf:string IRI="https://schema.pearson.com/ns/xowl/IdentifierAxiom">IdentifierAxiom</xpf:string>
                 </xpf:array>
                 <xpf:string key="id">urn:pearson:identifier:f1b43451-2942-415d-b036-3392aaf0fb42</xpf:string>
-                <xpf:string key="idTerm">https://schema.pearson.com/ns/system/epsID</xpf:string>
-                <xpf:string key="idValue">...</xpf:string>
+                <xpf:string key="idTerm" type="IRI" IRI="https://schema.pearson.com/ns/xowl/idTerm">https://schema.pearson.com/ns/system/epsID</xpf:string>
+                <xpf:string key="idValue" type="IRI" IRI="https://schema.pearson.com/ns/xowl/idValue">...</xpf:string>
             </xpf:map>
         </x:expect>
     </x:scenario>    
@@ -125,14 +116,14 @@
         <x:expect label="It should return an XML document">
             <xpf:map>
                 <xpf:array key="type">
-                    <xpf:string>LearningObjective</xpf:string>
+                    <xpf:string IRI="https://schema.pearson.com/ns/learn/LearningObjective">LearningObjective</xpf:string>
                 </xpf:array>
                 <xpf:string key="id">urn:pearson:educationalgoal:61b9f4c5-4570-4c18-b23b-bc0021c0093d</xpf:string>
-                <xpf:map key="description">
-                    <xpf:string key="en">...</xpf:string>
+                <xpf:map key="description" IRI="http://schema.org/description">
+                    <xpf:string key="en" language="en" type="LangString" IRI="http://schema.org/description">...</xpf:string>
                 </xpf:map>
-                <xpf:array key="learningDimension">
-                    <xpf:string>...</xpf:string>
+                <xpf:array key="learningDimension" IRI="https://schema.pearson.com/ns/learn/learningDimension">
+                    <xpf:string type="IRI" IRI="https://schema.pearson.com/ns/learn/learningDimension">...</xpf:string>
                 </xpf:array>
             </xpf:map>
         </x:expect>
