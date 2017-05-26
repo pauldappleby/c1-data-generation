@@ -18,13 +18,15 @@
         <xpf:map>
             <xsl:call-template name="getType">
                 <xsl:with-param name="baseType">Work</xsl:with-param>
+                <xsl:with-param name="baseTypeIRI">https://schema.pearson.com/ns/content/Work</xsl:with-param>
                 <xsl:with-param name="extendedTypes" select="('Container')"/>
+                <xsl:with-param name="extendedTypesIRIs" select="('https://schema.pearson.com/ns/content/Container')"/>
             </xsl:call-template>
             <xpf:string key="id">
                 <xsl:value-of select="@urn"/>
             </xpf:string>
-            <xpf:map key="name">
-                <xpf:string key="en">
+            <xpf:map key="name" IRI="http://schema.org/name" type="LanguageContainer">
+                <xpf:string key="en" IRI="http://schema.org/name" language="en">
                     <xsl:value-of select="c1:getName()"/>
                 </xpf:string>
             </xpf:map>
@@ -46,12 +48,13 @@
         <xpf:map>
             <xsl:call-template name="getType">
                 <xsl:with-param name="baseType">Work</xsl:with-param>
+                <xsl:with-param name="baseTypeIRI">https://schema.pearson.com/ns/content/Work</xsl:with-param>
             </xsl:call-template>
             <xpf:string key="id">
                 <xsl:value-of select="@urn"/>
             </xpf:string>
-            <xpf:map key="name">
-                <xpf:string key="en">
+            <xpf:map key="name" IRI="http://schema.org/name" type="LanguageContainer">
+                <xpf:string key="en" IRI="http://schema.org/name" language="en">
                     <xsl:value-of select="c1:getName()"/>
                 </xpf:string>
             </xpf:map>
@@ -73,14 +76,15 @@
             <xsl:variable name="getTypes">
                 <xsl:call-template name="getType">
                     <xsl:with-param name="baseType">Manifestation</xsl:with-param>
+                    <xsl:with-param name="baseTypeIRI">https://schema.pearson.com/ns/content/Manifestation</xsl:with-param>
                 </xsl:call-template>
             </xsl:variable>
             <xsl:copy-of select="$getTypes"/>
             <xpf:string key="id">
                 <xsl:value-of select="@urn"/>
             </xpf:string>
-            <xpf:map key="name">
-                <xpf:string key="en">
+            <xpf:map key="name" IRI="http://schema.org/name" type="LanguageContainer">
+                <xpf:string key="en" IRI="http://schema.org/name" language="en">
                     <xsl:value-of select="c1:getName()"/>
                 </xpf:string>
             </xpf:map>
@@ -96,20 +100,20 @@
     <xsl:template match="document[@type = 'IdentifierAxiom']">
         <xpf:map>
             <xpf:array key="type">
-                <xpf:string>IdentifierAxiom</xpf:string>
+                <xpf:string IRI="https://schema.pearson.com/ns/xowl/IdentifierAxiom">IdentifierAxiom</xpf:string>
             </xpf:array>
             <xpf:string key="id">
                 <xsl:value-of select="@urn"/>
             </xpf:string>
-            <xpf:string key="idTerm">https://schema.pearson.com/ns/system/epsID</xpf:string>
-            <xpf:string key="idValue">urn:pearson:eps:<xsl:value-of select="uuid:randomUUID()"/></xpf:string>
+            <xpf:string key="idTerm" type="IRI" IRI="https://schema.pearson.com/ns/xowl/idTerm">https://schema.pearson.com/ns/system/epsID</xpf:string>
+            <xpf:string key="idValue" type="IRI" IRI="https://schema.pearson.com/ns/xowl/idValue">urn:pearson:eps:<xsl:value-of select="uuid:randomUUID()"/></xpf:string>
         </xpf:map>
     </xsl:template>
 
     <xsl:template match="document[@type = 'MatchAxiom']">
         <xpf:map>
             <xpf:array key="type">
-                <xpf:string>MatchAxiom</xpf:string>
+                <xpf:string IRI="https://schema.pearson.com/ns/xkos/IdentifierAxiom">MatchAxiom</xpf:string>
             </xpf:array>
             <xpf:string key="id">
                 <xsl:value-of select="@urn"/>
@@ -121,16 +125,16 @@
             <xsl:variable name="targetLOindex" select="xs:integer($randomNumbers[2] * count($learningObjectives) + 1)" as="xs:integer?"/>
             <xsl:variable name="subjectLO" select="$learningObjectives[$subjectLOindex]/@urn"/>                    
             <xsl:variable name="targetLO" select="$learningObjectives[$targetLOindex]/@urn"/>                    
-            <xpf:string key="matchType">http://www.w3.org/2004/02/skos/core#exactMatch</xpf:string>
-            <xpf:string key="matchSubject"><xsl:value-of select="$subjectLO"/></xpf:string>
-            <xpf:string key="matchTarget"><xsl:value-of select="$targetLO"/></xpf:string>
+            <xpf:string key="matchType" type="IRI" IRI="https://schema.pearson.com/ns/xkos/matchType">http://www.w3.org/2004/02/skos/core#exactMatch</xpf:string>
+            <xpf:string key="matchSubject" type="IRI" IRI="https://schema.pearson.com/ns/xkos/matchSubject"><xsl:value-of select="$subjectLO"/></xpf:string>
+            <xpf:string key="matchTarget" type="IRI" IRI="https://schema.pearson.com/ns/xkos/matchTarget"><xsl:value-of select="$targetLO"/></xpf:string>
         </xpf:map>
     </xsl:template>
     
     <xsl:template match="document[@type = 'LearningObjective']">
         <xpf:map>
             <xpf:array key="type">
-                <xpf:string>LearningObjective</xpf:string>
+                <xpf:string IRI="https://schema.pearson.com/ns/learn/LearningObjective">LearningObjective</xpf:string>
             </xpf:array>
             <xpf:string key="id">
                 <xsl:value-of select="@urn"/>
@@ -143,9 +147,10 @@
     <xsl:template match="relation" mode="AddRelationships">
         <xsl:variable name="relatedUrns" select="document/@urn"/>
         <xsl:if test="not(empty($relatedUrns))">
-            <xpf:array key="{@shortName}">
+            <xsl:variable name="iri" select="@IRI"/>
+            <xpf:array key="{@shortName}" IRI="{$iri}">
                 <xsl:for-each select="$relatedUrns">
-                    <xpf:string>
+                    <xpf:string type="IRI" IRI="{$iri}">
                         <xsl:value-of select="."/>
                     </xpf:string>
                 </xsl:for-each>

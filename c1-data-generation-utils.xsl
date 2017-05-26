@@ -12,6 +12,8 @@
  
     <!-- XML to JSON convertor -->
     <xsl:import href="JSON-LD-API-XML-to-JSON.xsl"/>
+
+    <xsl:import href="XML-to-Quads.xsl"/>
     
     <xsl:variable name="words" select="document('seed-data/words.xml')/words"/>
     <xsl:variable name="subjects" select="document('seed-data/subject.xml')/rdf:RDF/rdf:Description[rdf:type/@rdf:resource = 'http://www.w3.org/2004/02/skos/core#Concept']/@rdf:about" as="xs:string+"/>
@@ -51,24 +53,38 @@
                     </xsl:with-param>
                 </xsl:call-template>
             </xsl:result-document>
+<!--            <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
+                '[Y0001][M01][D01]')}/{$env}/nquads/{$set}/{lower-case($documentType)}/{lower-case($documentType)}-{$documentUuid}.nquad" method="text">-->
+                <xsl:call-template name="jld:xml-to-quads">
+                    <xsl:with-param name="XMLinput">
+                        <xpf:map>
+                            <xsl:copy-of select="$context"/>
+                            <xsl:copy-of select="$documentContent/*"/>
+                        </xpf:map>
+                    </xsl:with-param>
+                </xsl:call-template>
+<!--            </xsl:result-document> -->
         </xsl:for-each>
     </xsl:template>
     
     <xsl:template name="getType">
-        <xsl:param name="baseType"/>
+        <xsl:param name="baseType" required="yes"/>
+        <xsl:param name="baseTypeIRI" required="yes"/>
         <xsl:param name="extendedTypes" as="xs:string*"/>
+        <xsl:param name="extendedTypesIRIs" as="xs:string*"/>
         <xsl:variable name="usableTypes" select="$type/type"/>
         <xsl:variable name="additionalType" select="for $num in rd:random-sequence(1) return
             xs:integer(floor($num * count($usableTypes)) + 1)"/>
         <xpf:array key="type">
-            <xpf:string>
+            <xpf:string IRI="{$baseTypeIRI}">
                 <xsl:value-of select="$baseType"/>
             </xpf:string>
-            <xpf:string>
+            <xpf:string IRI="{$usableTypes[$additionalType]}">
                 <xsl:value-of select="$usableTypes[$additionalType]/@short"/>
             </xpf:string>
             <xsl:for-each select="$extendedTypes">
-                <xpf:string><xsl:value-of select="."/></xpf:string>
+                <xsl:variable name="position" select="position()"/>
+                <xpf:string IRI="{$extendedTypesIRIs[$position]}"><xsl:value-of select="."/></xpf:string>
             </xsl:for-each>
         </xpf:array>
     </xsl:template>
@@ -92,7 +108,7 @@
         <xsl:param name="month" select="xs:integer(floor(rd:random-sequence(1) * 12) + 1)" as="xs:integer"/>
         <xsl:param name="hour" select="xs:integer(floor(rd:random-sequence(1) * 24))" as="xs:integer"/>
         <xsl:param name="minute" select="xs:integer(floor(rd:random-sequence(1) * 60))" as="xs:integer"/>
-        <xpf:string key="dateCreated">
+        <xpf:string key="dateCreated" IRI="http://schema.org/dateCreated" type="http://www.w3.org/2001/XMLSchema#dateTime">
             <xsl:text>2016-</xsl:text>
             <xsl:if test="$month &lt; 10">0</xsl:if>
             <xsl:value-of select="$month"/>
@@ -116,10 +132,10 @@
                 for $num in rd:random-sequence($keysCount)
                 return
                     xs:integer(floor($num * count($keywords)))" as="xs:integer*"/>
-            <xpf:map key="keyword">
+            <xpf:map key="keyword" IRI="http://schema.org/keyword" type="LanguageContainer">
                 <xpf:array key="en">
                     <xsl:for-each select="$keys">
-                        <xpf:string>
+                        <xpf:string language="en" IRI="http://schema.org/keyword">
                             <xsl:value-of select="$keywords[current()]"/>
                         </xpf:string>
                     </xsl:for-each>
@@ -133,8 +149,8 @@
             for $num in rd:random-sequence(1)
             return
             xs:integer(floor($num * count($learningObjectiveDescription)))"/>
-        <xpf:map key="description">
-            <xpf:string key="en">
+        <xpf:map key="description" IRI="http://schema.org/description">
+            <xpf:string key="en" type="LangString" IRI="http://schema.org/description">
                 <xsl:value-of select="$learningObjectiveDescription[$descriptionIndex]"/>
             </xpf:string>
         </xpf:map>
@@ -145,8 +161,8 @@
             for $num in rd:random-sequence(1)
             return
             xs:integer(floor($num * count($learningDimension)))"/>
-        <xpf:array key="learningDimension">
-            <xpf:string>
+        <xpf:array key="learningDimension" IRI="https://schema.pearson.com/ns/learn/learningDimension">
+            <xpf:string type="IRI" IRI="https://schema.pearson.com/ns/learn/learningDimension">
                 <xsl:value-of select="$learningDimension[$dimensionIndex]"/>
             </xpf:string>
         </xpf:array>
@@ -159,9 +175,9 @@
                 for $num in rd:random-sequence($subjectCount)
                 return
                     xs:integer(floor($num * count($subjects)))"/>
-            <xpf:array key="subject">
+            <xpf:array key="subject" IRI="http://purl.org/dc/terms/subject">
                 <xsl:for-each select="$subject">
-                    <xpf:string>
+                    <xpf:string type="IRI" IRI="http://purl.org/dc/terms/subject">
                         <xsl:value-of select="$subjects[current()]"/>
                     </xpf:string>
                 </xsl:for-each>
@@ -178,7 +194,7 @@
             return
                 xs:integer(floor($num * count($formats/format[@type = $types//xpf:string])) + 1)" as="xs:integer"/>
         <xsl:if test="$formats/format[@type = $types//xpf:string][$formatIndex]">
-            <xpf:string key="format">
+            <xpf:string key="format" IRI="http://schema.org/fileFormat">
                 <xsl:value-of select="$formats/format[contains($types, @type)][$formatIndex]/@mimetype"/>
             </xpf:string>
         </xsl:if>

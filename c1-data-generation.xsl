@@ -16,17 +16,17 @@
     <!-- Save templates have a higher priority ensuring they get executed. The lower priority templates are then testable -->
     <xsl:import href="c1-data-generation-content-save.xsl"/>
     
-    <xsl:output method="xml" indent="yes" exclude-result-prefixes="rd c1 uuid"/>
+    <xsl:output method="text" indent="yes" exclude-result-prefixes="rd c1 uuid"/>
     
     <!-- Number of items to generate for seed data -->
-    <xsl:param name="numWorks">10</xsl:param>
-    <xsl:param name="numWorkContainers">10</xsl:param>
+    <xsl:param name="numWorks">10000</xsl:param>
+    <xsl:param name="numWorkContainers">1000</xsl:param>
 
     <!-- Number of items to generate for performances data -->
-    <xsl:param name="numPerfMatchAxioms">10</xsl:param>
-    <xsl:param name="numPerfManifestations">10</xsl:param>
-    <xsl:param name="numPerfLearningObjectives">10</xsl:param>
-    <xsl:param name="numPerfIdentifierAxioms">10</xsl:param>
+    <xsl:param name="numPerfMatchAxioms">1000</xsl:param>
+    <xsl:param name="numPerfManifestations">1000</xsl:param>
+    <xsl:param name="numPerfLearningObjectives">1000</xsl:param>
+    <xsl:param name="numPerfIdentifierAxioms">1000</xsl:param>
 
     <xsl:param name="env">dev</xsl:param>
     <xsl:param name="outputFolder">generated-data</xsl:param>
@@ -127,12 +127,33 @@
             <xsl:message terminate="yes">Nodes are missing test sets</xsl:message>
         </xsl:if>
         
-        <!-- Now we process the generated structure to actually generate all the output -->
-        <xsl:apply-templates select="$processingStructure">
-            <xsl:with-param name="outputFolder" tunnel="yes" select="$outputFolder"/>
-            <xsl:with-param name="env" tunnel="yes" select="$env"/>          
-        </xsl:apply-templates>
-
+        <!-- Now we process the generated structure to actually generate all the output grouping together for quads output -->
+        <xsl:message select="count($processingStructure/documents/*)"/>
+        <xsl:for-each-group select="$processingStructure/documents/*" group-adjacent="floor(position() div 1000)">
+            <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
+                '[Y0001][M01][D01]')}/{$env}/nquads/{current-grouping-key()}.nq" method="text">
+                <xsl:apply-templates select="current-group()">
+                    <xsl:with-param name="outputFolder" tunnel="yes" select="$outputFolder"/>
+                    <xsl:with-param name="env" tunnel="yes" select="$env"/>          
+                </xsl:apply-templates>
+                <!-- Add in named graph quads -->
+                <xsl:for-each select="current-group()/descendant-or-self::document">
+                    <xsl:variable name="url" select="concat('https://data.pearson.com/graph/', translate(substring-after(@urn, 'pearson:'), ':', '/'))"/>
+                    <xsl:text>&lt;</xsl:text>
+                    <xsl:value-of select="$url"/>
+                    <xsl:text>&gt; &lt;https://schema.pearson.com/ns/raf/latest&gt; "1"^^&lt;http://www.w3.org/2001/XMLSchema#int&gt; &lt;https://data.pearson.com/graph-metadata&gt; .&#10;</xsl:text>
+                    <xsl:text>&lt;</xsl:text>
+                    <xsl:value-of select="$url"/>
+                    <xsl:text>&gt; &lt;https://schema.pearson.com/ns/raf/checkedout&gt; "true"^^&lt;http://www.w3.org/2001/XMLSchema#boolean&gt; &lt;https://data.pearson.com/graph-metadata&gt; .&#10;</xsl:text>
+                    <xsl:text>&lt;</xsl:text>
+                    <xsl:value-of select="$url"/>
+                    <xsl:text>&gt; &lt;https://schema.pearson.com/ns/raf/revision&gt; &lt;</xsl:text>
+                    <xsl:value-of select="$url"/>
+                    <xsl:text>/1&gt; &lt;https://data.pearson.com/graph-metadata&gt; .&#10;</xsl:text>
+                </xsl:for-each>
+            </xsl:result-document>
+        </xsl:for-each-group>
+        
         <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
             '[Y0001][M01][D01]')}/{$env}/processing-structure.xml" method="xml">
             <xsl:copy-of select="$processingStructure"/>
@@ -173,9 +194,7 @@
     </xsl:template>
  
     <xsl:template match="documents">
-        <xpf:map>
-            <xsl:apply-templates select="document"/>
-        </xpf:map>
+        <xsl:apply-templates select="document"/>
     </xsl:template>
 
     <xsl:template match="relation">
