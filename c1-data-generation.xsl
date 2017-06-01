@@ -19,7 +19,7 @@
     <xsl:output method="text" indent="yes" exclude-result-prefixes="rd c1 uuid"/>
     
     <!-- Number of items to generate for seed data -->
-    <xsl:param name="numWorks">10</xsl:param>
+    <xsl:param name="numWorks">100</xsl:param>
     <xsl:param name="numWorkContainers">10</xsl:param>
 
     <!-- Number of items to generate for performances data -->
@@ -28,8 +28,17 @@
     <xsl:param name="numPerfLearningObjectives">10</xsl:param>
     <xsl:param name="numPerfIdentifierAxioms">10</xsl:param>
 
-    <xsl:param name="env">dev</xsl:param>
+    <!-- Value needs to match a name attribute from environmentURLs -->
+    <xsl:param name="env">test</xsl:param>
     <xsl:param name="outputFolder">generated-data</xsl:param>
+    <!-- Development database to include in Curl queries -->
+    <xsl:param name="devDB">qa0</xsl:param>
+ 
+    <!-- Enviroment details -->
+    <xsl:param name="environmentURLs" as="element()+">
+        <env name="dev" authText="-H &quot;Authorization: Basic Ymx1ZWJlcnJ5OmVAQkhSTUF2M2V5S2xiT1VjS0tAWl56Q0ZhMDRtYw==&quot; -H &quot;X-Roles: LearningAdmin,ContentMetadataAdmin&quot;">https://develop-data.pearsoncms.net/api/api</env>
+        <env name="test" authText="-H &quot;Authorization: Basic Ymx1ZWJlcnJ5OmVAQkhSTUF2M2V5S2xiT1VjS0tAWl56Q0ZhMDRtYw==&quot; -H &quot;X-Roles: LearningAdmin,ContentMetadataAdmin&quot;">https://test-data.pearsoncms.net/api/api</env>
+    </xsl:param>
     
     <!-- Seeds for random numbers -->
     <xsl:param name="numWorksSeed">5987907735</xsl:param>
@@ -46,7 +55,7 @@
                     <xsl:variable name="uuid" select="uuid:randomUUID()"/>
                     <xsl:variable name="hasPartIndex" select="position()"/>
                     <xsl:variable name="hasPartCount" select="xs:integer(floor($hasPartCounts[$hasPartIndex] * 5) + 1)" as="xs:integer"/>
-                    <document testSet="seedData" type="WorkContainer" uuid="{$uuid}" urn="urn:pearson:work:{$uuid}">
+                    <document testSet="seedData" type="Work Container" uuid="{$uuid}" urn="urn:pearson:work:{$uuid}">
                         <relation IRI="http://schema.org/hasPart" shortName="hasPart">
                             <xsl:for-each select="1 to $hasPartCount">
                                 <xsl:variable name="workUuid" select="uuid:randomUUID()"/>                                
@@ -104,7 +113,7 @@
                 <!-- These are to test POSTing learning objectives to the API -->
                 <xsl:for-each select="1 to $numPerfLearningObjectives">
                     <xsl:variable name="learningObjectiveUuid" select="uuid:randomUUID()"/>                                
-                    <document testSet="performanceData" type="LearningObjective" uuid="{$learningObjectiveUuid}" urn="urn:pearson:educationalgoal:{$learningObjectiveUuid}"/>                    
+                    <document testSet="performanceData" type="EducationalGoal" uuid="{$learningObjectiveUuid}" urn="urn:pearson:educationalgoal:{$learningObjectiveUuid}"/>                    
                 </xsl:for-each>
                 
                 <!-- These are to test POSTing IdentifierAxioms to the API -->
@@ -128,6 +137,7 @@
         </xsl:if>
         
         <!-- Now we process the generated structure to actually generate all the output grouping together for quads output -->
+        <!-- Note in this instance we only include seed data -->
         <xsl:message select="count($processingStructure/documents/*)"/>
         <xsl:for-each-group select="$processingStructure/documents/*" group-adjacent="floor(position() div 1000)">
             <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
@@ -137,7 +147,7 @@
                     <xsl:with-param name="env" tunnel="yes" select="$env"/>          
                 </xsl:apply-templates>
                 <!-- Add in named graph quads -->
-                <xsl:for-each select="current-group()/descendant-or-self::document">
+                <xsl:for-each select="current-group()/descendant-or-self::document[contains(@testSet, 'seedData')]">
                     <xsl:variable name="url" select="concat('https://data.pearson.com/graph/', translate(substring-after(@urn, 'pearson:'), ':', '/'))"/>
                     <xsl:text>&lt;</xsl:text>
                     <xsl:value-of select="$url"/>
@@ -172,27 +182,115 @@
                     <xsl:text>timeout 1&#10;</xsl:text>
                     <xsl:text>echo </xsl:text>
                     <xsl:value-of select="concat(position(), ' of ', $documentCount)"/>
-                    <xsl:text>&#10;curl -X POST -d @json/</xsl:text>
-                    <xsl:value-of select="$testSet"/>
-                    <xsl:text>/</xsl:text>
-                    <xsl:value-of select="lower-case(@type)"/>
-                    <xsl:text>/</xsl:text>
-                    <xsl:value-of select="lower-case(@type)"/>
-                    <xsl:text>-</xsl:text>
-                    <xsl:value-of select="@uuid"/>
-                    <xsl:text>.json -H "Content-Type: application/json" -H "Authorization: Basic Ymx1ZWJlcnJ5OmVAQkhSTUF2M2V5S2xiT1VjS0tAWl56Q0ZhMDRtYw==" -H "X-Roles: LearningAdmin,ContentMetadataAdmin" -k https://develop-data.pearsoncms.net/api/api/thing?db=qa0 -o results/results-</xsl:text>
-                    <xsl:value-of select="$testSet"/>
-                    <xsl:text>-</xsl:text>
-                    <xsl:value-of select="lower-case(@type)"/>
-                    <xsl:text>-</xsl:text>
-                    <xsl:value-of select="@uuid"/>
-                    <xsl:text>.txt -i&#10;</xsl:text>
+                    <xsl:text>&#10;</xsl:text>
+                    <xsl:call-template name="GenerateCurlWriteListEntry">
+                        <xsl:with-param name="type" select="@type"/>
+                        <xsl:with-param name="uuid" select="@uuid"/>
+                        <xsl:with-param name="testSet" select="$testSet"/>
+                    </xsl:call-template>
                 </xsl:for-each>
             </xsl:result-document>  
         </xsl:for-each>
-        
+
+        <!-- We generate a CURL output so that all files can be read automatically -->
+        <xsl:for-each select="distinct-values($processingStructure//document/@testSet/tokenize(., ' '))">
+            <xsl:variable name="testSet" select="."/>
+            <xsl:for-each select="distinct-values($processingStructure//document[contains(@testSet, $testSet)]/@type)">
+                <xsl:variable name="type" select="."/>
+                <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
+                '[Y0001][M01][D01]')}/{$env}/{$testSet}-{lower-case(translate($type, ' ', ''))}-read-curl-file.bat" method="text">
+                    <xsl:text>md results&#10;</xsl:text>
+                    <xsl:variable name="documentCount" select="count($processingStructure//document[contains(@testSet, $testSet)])"/>
+                    <xsl:for-each select="$processingStructure//document[contains(@testSet, $testSet) and @type = $type]">
+                        <xsl:text>timeout 1&#10;</xsl:text>
+                        <xsl:text>echo </xsl:text>
+                        <xsl:value-of select="concat(position(), ' of ', $documentCount)"/>
+                        <xsl:text>&#10;</xsl:text>
+                        <xsl:call-template name="GenerateCurlReadListEntry">
+                            <xsl:with-param name="urn" select="@urn"/>
+                            <xsl:with-param name="uuid" select="@uuid"/>
+                        </xsl:call-template>
+                    </xsl:for-each>
+                </xsl:result-document>  
+            </xsl:for-each>
+        </xsl:for-each>
+
+        <!-- We generate a list of all URIs generated -->
+        <xsl:for-each select="distinct-values($processingStructure//document/@testSet/tokenize(., ' '))">
+            <xsl:variable name="testSet" select="."/>
+            <xsl:for-each select="distinct-values($processingStructure//document[contains(@testSet, $testSet)]/@type)">
+                <xsl:variable name="type" select="."/>
+                <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
+                    '[Y0001][M01][D01]')}/{$env}/{$testSet}-{lower-case(translate($type, ' ', ''))}-uri-list.txt" method="text">
+                    <xsl:variable name="documentCount" select="count($processingStructure//document[contains(@testSet, $testSet)])"/>
+                    <xsl:for-each select="$processingStructure//document[contains(@testSet, $testSet) and @type = $type]">
+                        <xsl:call-template name="GenerateURIlistEntry">
+                            <xsl:with-param name="urn" select="@urn"/>
+                            <xsl:with-param name="uuid" select="@uuid"/>
+                        </xsl:call-template>
+                    </xsl:for-each>
+                </xsl:result-document>  
+            </xsl:for-each>
+        </xsl:for-each>
+
     </xsl:template>
- 
+
+    <xsl:template name="GenerateCurlWriteListEntry">
+        <xsl:param name="type" required="yes"/>
+        <xsl:param name="uuid" required="yes"/>
+        <xsl:param name="testSet"/>
+        <xsl:text>curl -X POST -d @json/</xsl:text>
+        <xsl:value-of select="$testSet"/>
+        <xsl:text>/</xsl:text>
+        <xsl:value-of select="lower-case(translate($type, ' ', ''))"/>
+        <xsl:text>/</xsl:text>
+        <xsl:value-of select="lower-case(translate($type, ' ', ''))"/>
+        <xsl:text>-</xsl:text>
+        <xsl:value-of select="@uuid"/>
+        <xsl:text>.json -H "Content-Type: application/json" </xsl:text>
+        <xsl:value-of select="$environmentURLs[@name = $env]/@authText"/>
+        <xsl:text> -k </xsl:text>
+        <xsl:value-of select="$environmentURLs[@name = $env]"/>
+        <xsl:text>/thing?db=</xsl:text>
+        <xsl:value-of select="$devDB"/>
+        <xsl:text> -o results/results-</xsl:text>
+        <xsl:value-of select="$testSet"/>
+        <xsl:text>-</xsl:text>
+        <xsl:value-of select="lower-case(translate($type, ' ', ''))"/>
+        <xsl:text>-</xsl:text>
+        <xsl:value-of select="$uuid"/>
+        <xsl:text>.txt -i&#10;</xsl:text>
+    </xsl:template>
+    
+    <xsl:template name="GenerateCurlReadListEntry">
+        <xsl:param name="urn" required="yes"/>
+        <xsl:param name="uuid" required="yes"/>
+        <xsl:text>curl -H "Accept: application/ld+json" </xsl:text>
+        <xsl:value-of select="$environmentURLs[@name = $env]/@authText"/>
+        <xsl:text> -k </xsl:text>
+        <xsl:value-of select="$environmentURLs[@name = $env]"/>
+        <xsl:text>/</xsl:text>
+        <xsl:value-of select="substring-before(substring-after($urn, 'pearson:'), ':')"/>
+        <xsl:text>/</xsl:text>
+        <xsl:value-of select="lower-case($uuid)"/>
+        <xsl:text>?db=</xsl:text>
+        <xsl:value-of select="$devDB"/>
+        <xsl:text>&#10;</xsl:text>
+    </xsl:template>
+    
+    <xsl:template name="GenerateURIlistEntry">
+        <xsl:param name="urn" required="yes"/>
+        <xsl:param name="uuid" required="yes"/>
+        <xsl:value-of select="$environmentURLs[@name = $env]"/>
+        <xsl:text>/</xsl:text>
+        <xsl:value-of select="substring-before(substring-after($urn, 'pearson:'), ':')"/>
+        <xsl:text>/</xsl:text>
+        <xsl:value-of select="lower-case($uuid)"/>
+        <xsl:text>?db=</xsl:text>
+        <xsl:value-of select="$devDB"/>
+        <xsl:text>&#10;</xsl:text>
+    </xsl:template>
+
     <xsl:template match="documents">
         <xsl:apply-templates select="document"/>
     </xsl:template>

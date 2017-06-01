@@ -12,7 +12,7 @@
 
     <xsl:import href="c1-data-generation-utils.xsl"/>
     
-    <xsl:template match="document[@type = 'WorkContainer']">
+    <xsl:template match="document[@type = 'Work Container']">
         <xsl:param name="keywordCount" select="xs:integer(floor(rd:random-sequence(1) * 5))" as="xs:integer?"/>
         <xsl:param name="subjectCount" select="xs:integer(floor(rd:random-sequence(1) * 5))" as="xs:integer?"/>
         <xpf:map>
@@ -119,7 +119,7 @@
                 <xsl:value-of select="@urn"/>
             </xpf:string>
             <xsl:variable name="set" select="@testSet"/>
-            <xsl:variable name="learningObjectives" select="//document[contains(@testSet, $set) and @type = 'LearningObjective']"/>
+            <xsl:variable name="learningObjectives" select="//document[contains(@testSet, $set) and @type = 'EducationalGoal']"/>
             <xsl:variable name="randomNumbers" select="rd:random-sequence(2)"/>
             <xsl:variable name="subjectLOindex" select="xs:integer($randomNumbers[1] * count($learningObjectives) + 1)" as="xs:integer?"/>
             <xsl:variable name="targetLOindex" select="xs:integer($randomNumbers[2] * count($learningObjectives) + 1)" as="xs:integer?"/>
@@ -131,7 +131,7 @@
         </xpf:map>
     </xsl:template>
     
-    <xsl:template match="document[@type = 'LearningObjective']">
+    <xsl:template match="document[@type = 'EducationalGoal']">
         <xpf:map>
             <xpf:array key="type">
                 <xpf:string IRI="https://schema.pearson.com/ns/learn/LearningObjective">LearningObjective</xpf:string>

@@ -14,7 +14,7 @@
         <xsl:param name="resource" tunnel="yes"/>
         <xsl:param name="graph" tunnel="yes"/>
         <xsl:variable name="newResource" select="xpf:string[@key = 'id']"/>
-        <xsl:variable name="newGraph" select="concat('&lt;https://data.pearson.com/ns/graph/', translate(substring-after(xpf:string[@key = 'id'], 'pearson:'), ';', '/'), '&gt;')"/>
+        <xsl:variable name="newGraph" select="concat('&lt;https://data.pearson.com/graph/', translate(substring-after(xpf:string[@key = 'id'], 'pearson:'), ':', '/'), '&gt;')"/>
         <xsl:apply-templates select="*" mode="#current">
             <xsl:with-param name="resource" select="if ($newResource) then $newResource else $resource" tunnel="yes"/>
             <xsl:with-param name="graph" select="if ($newResource) then $newGraph else $graph" tunnel="yes"/>

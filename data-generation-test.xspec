@@ -2,12 +2,31 @@
 <x:description xmlns:x="http://www.jenitennison.com/xslt/xspec"
     xmlns:xpf="http://www.w3.org/2005/xpath-functions"
     stylesheet="c1-data-generation.xsl">
+    
+    <x:param name="env">dev</x:param>
+    <x:param name="devDB">qa0</x:param>
 
     <x:scenario label="When processing a documents element">
         <x:context>
             <documents/>
         </x:context>
         <x:expect label="It should produce an xpf:map element"/>
+    </x:scenario>
+
+    <x:scenario label="When generating a URI list entry">
+        <x:call template="GenerateURIlistEntry">
+            <x:param name="urn">urn:pearson:work:3836a02a-fd70-4b6b-8e7e-eb27009caeea</x:param>
+            <x:param name="uuid">80ee613d-0a33-4350-96bf-73ecbceec1d7</x:param>
+        </x:call>
+        <x:expect label="It should return a Curl command">https://develop-data.pearsoncms.net/api/api/work/80ee613d-0a33-4350-96bf-73ecbceec1d7?db=qa0&#10;</x:expect>
+    </x:scenario>
+    
+    <x:scenario label="When generating a Curl read list entry">
+        <x:call template="GenerateCurlReadListEntry">
+            <x:param name="urn">urn:pearson:work:3836a02a-fd70-4b6b-8e7e-eb27009caeea</x:param>
+            <x:param name="uuid">3836a02a-fd70-4b6b-8e7e-eb27009caeea</x:param>
+        </x:call>
+        <x:expect label="It should return a Curl command">curl -H "Accept: application/ld+json" -H "Authorization: Basic Ymx1ZWJlcnJ5OmVAQkhSTUF2M2V5S2xiT1VjS0tAWl56Q0ZhMDRtYw==" -H "X-Roles: LearningAdmin,ContentMetadataAdmin" -k https://develop-data.pearsoncms.net/api/api/work/3836a02a-fd70-4b6b-8e7e-eb27009caeea?db=qa0&#10;</x:expect>
     </x:scenario>
     
     <x:scenario label="When supplying an ImageObject and an index value of 1">

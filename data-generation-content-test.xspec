@@ -40,9 +40,9 @@
                     <xpf:string key="en" language="en" IRI="http://schema.org/name">...</xpf:string>
                 </xpf:map>
                 <xpf:string key="dateCreated" IRI="http://schema.org/dateCreated" type="http://www.w3.org/2001/XMLSchema#dateTime">...</xpf:string>
-                <xpf:map key="keyword" IRI="http://schema.org/keyword" type="LanguageContainer">
+                <xpf:map key="keyword" IRI="https://schema.pearson.com/ns/content/keyword" type="LanguageContainer">
                     <xpf:array key="en">
-                        <xpf:string language="en" IRI="http://schema.org/keyword">...</xpf:string>
+                        <xpf:string language="en" IRI="https://schema.pearson.com/ns/content/keyword">...</xpf:string>
                     </xpf:array>
                 </xpf:map>
                 <xpf:array key="subject" IRI="http://purl.org/dc/terms/subject">
@@ -109,7 +109,7 @@
     
     <x:scenario label="When generating an LearningObjective">
         <x:context>
-            <document testSet="performanceData" type="LearningObjective"
+            <document testSet="performanceData" type="EducationalGoal"
                 uuid="61b9f4c5-4570-4c18-b23b-bc0021c0093d"
                 urn="urn:pearson:educationalgoal:61b9f4c5-4570-4c18-b23b-bc0021c0093d"/>
         </x:context>

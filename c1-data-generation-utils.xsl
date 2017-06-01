@@ -30,20 +30,21 @@
         <xsl:param name="testSet"/>
         <xsl:param name="documentType"/>
         <xsl:param name="documentUuid"/>
+        <xsl:param name="documentURN"/>
         <xsl:param name="documentContent"/>
         <xsl:param name="outputFolder" required="yes"/>
         <xsl:param name="env" required="yes"/>
         <xsl:for-each select="tokenize($testSet, ' ')">
             <xsl:variable name="set" select="."/>
             <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
-                '[Y0001][M01][D01]')}/{$env}/xml/{$set}/{lower-case($documentType)}/{lower-case($documentType)}-{$documentUuid}.xml" method="xml">
+                '[Y0001][M01][D01]')}/{$env}/xml/{$set}/{lower-case(translate($documentType, ' ', ''))}/{lower-case(translate($documentType, ' ', ''))}-{$documentUuid}.xml" method="xml">
                 <xpf:map>
                     <xsl:copy-of select="$context"/>
                     <xsl:copy-of select="$documentContent/*"/>
                 </xpf:map>
             </xsl:result-document>        
             <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
-                '[Y0001][M01][D01]')}/{$env}/json/{$set}/{lower-case($documentType)}/{lower-case($documentType)}-{$documentUuid}.json" method="text">
+                '[Y0001][M01][D01]')}/{$env}/json/{$set}/{lower-case(translate($documentType, ' ', ''))}/{lower-case(translate($documentType, ' ', ''))}-{$documentUuid}.json" method="text">
                 <xsl:call-template name="jld:XML-to-JSON">
                     <xsl:with-param name="XMLinput">
                         <xpf:map>
@@ -53,14 +54,27 @@
                     </xsl:with-param>
                 </xsl:call-template>
             </xsl:result-document>
-            <xsl:call-template name="jld:xml-to-quads">
-                <xsl:with-param name="XMLinput">
-                    <xpf:map>
-                        <xsl:copy-of select="$context"/>
-                        <xsl:copy-of select="$documentContent/*"/>
-                    </xpf:map>
-                </xsl:with-param>
-            </xsl:call-template>
+            <xsl:if test="contains($testSet, 'seedData')">
+                <xsl:call-template name="jld:xml-to-quads">
+                    <xsl:with-param name="XMLinput">
+                        <xpf:map>
+                            <xsl:copy-of select="$context"/>
+                            <xsl:variable name="url" select="concat('https://data.pearson.com/', translate(substring-after($documentURN, 'pearson:'), ':', '/'))"/>
+                            <xpf:string key="sameAs" type="IRI" IRI="http://www.w3.org/2002/07/owl#sameAs">
+                                <xsl:value-of select="$url"/>
+                            </xpf:string>
+                            <xpf:string key="isDefinedBy" type="IRI" IRI="http://www.w3.org/2000/01/rdf-schema#isDefinedBy">
+                                <xsl:value-of select="$url"/>
+                                <xsl:text>/metadata</xsl:text>
+                            </xpf:string>
+                            <xpf:string key="uuid" IRI="https://schema.pearson.com/ns/content/uuid">
+                                <xsl:value-of select="$documentUuid"/>
+                            </xpf:string>
+                            <xsl:copy-of select="$documentContent/*"/>
+                        </xpf:map>
+                    </xsl:with-param>
+                </xsl:call-template>
+            </xsl:if>
         </xsl:for-each>
     </xsl:template>
     
@@ -129,10 +143,10 @@
                 for $num in rd:random-sequence($keysCount)
                 return
                     xs:integer(floor($num * count($keywords)))" as="xs:integer*"/>
-            <xpf:map key="keyword" IRI="http://schema.org/keyword" type="LanguageContainer">
+            <xpf:map key="keyword" IRI="https://schema.pearson.com/ns/content/keyword" type="LanguageContainer">
                 <xpf:array key="en">
                     <xsl:for-each select="$keys">
-                        <xpf:string language="en" IRI="http://schema.org/keyword">
+                        <xpf:string language="en" IRI="https://schema.pearson.com/ns/content/keyword">
                             <xsl:value-of select="$keywords[current()]"/>
                         </xpf:string>
                     </xsl:for-each>
@@ -171,7 +185,7 @@
             <xsl:variable name="subject" select="
                 for $num in rd:random-sequence($subjectCount)
                 return
-                    xs:integer(floor($num * count($subjects)))"/>
+                    xs:integer(floor($num * count($subjects)) + 1)"/>
             <xpf:array key="subject" IRI="http://purl.org/dc/terms/subject">
                 <xsl:for-each select="$subject">
                     <xpf:string type="IRI" IRI="http://purl.org/dc/terms/subject">
