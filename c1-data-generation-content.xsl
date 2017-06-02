@@ -22,9 +22,11 @@
                 <xsl:with-param name="extendedTypes" select="('Container')"/>
                 <xsl:with-param name="extendedTypesIRIs" select="('https://schema.pearson.com/ns/content/Container')"/>
             </xsl:call-template>
-            <xpf:string key="id">
-                <xsl:value-of select="@urn"/>
-            </xpf:string>
+            <xsl:if test="@urn">
+                <xpf:string key="id">
+                    <xsl:value-of select="@urn"/>
+                </xpf:string>
+            </xsl:if>
             <xpf:map key="name" IRI="http://schema.org/name" type="LanguageContainer">
                 <xpf:string key="en" IRI="http://schema.org/name" language="en">
                     <xsl:value-of select="c1:getName()"/>
@@ -50,9 +52,11 @@
                 <xsl:with-param name="baseType">Work</xsl:with-param>
                 <xsl:with-param name="baseTypeIRI">https://schema.pearson.com/ns/content/Work</xsl:with-param>
             </xsl:call-template>
-            <xpf:string key="id">
-                <xsl:value-of select="@urn"/>
-            </xpf:string>
+            <xsl:if test="@urn">
+                <xpf:string key="id">
+                    <xsl:value-of select="@urn"/>
+                </xpf:string>
+            </xsl:if>
             <xpf:map key="name" IRI="http://schema.org/name" type="LanguageContainer">
                 <xpf:string key="en" IRI="http://schema.org/name" language="en">
                     <xsl:value-of select="c1:getName()"/>
@@ -80,9 +84,11 @@
                 </xsl:call-template>
             </xsl:variable>
             <xsl:copy-of select="$getTypes"/>
-            <xpf:string key="id">
-                <xsl:value-of select="@urn"/>
-            </xpf:string>
+            <xsl:if test="@urn">
+                <xpf:string key="id">
+                    <xsl:value-of select="@urn"/>
+                </xpf:string>
+            </xsl:if>
             <xpf:map key="name" IRI="http://schema.org/name" type="LanguageContainer">
                 <xpf:string key="en" IRI="http://schema.org/name" language="en">
                     <xsl:value-of select="c1:getName()"/>
@@ -102,9 +108,11 @@
             <xpf:array key="type">
                 <xpf:string IRI="https://schema.pearson.com/ns/xowl/IdentifierAxiom">IdentifierAxiom</xpf:string>
             </xpf:array>
-            <xpf:string key="id">
-                <xsl:value-of select="@urn"/>
-            </xpf:string>
+            <xsl:if test="@urn">
+                <xpf:string key="id">
+                    <xsl:value-of select="@urn"/>
+                </xpf:string>
+            </xsl:if>
             <xpf:string key="idTerm" type="IRI" IRI="https://schema.pearson.com/ns/xowl/idTerm">https://schema.pearson.com/ns/system/epsID</xpf:string>
             <xpf:string key="idValue" type="IRI" IRI="https://schema.pearson.com/ns/xowl/idValue">urn:pearson:eps:<xsl:value-of select="uuid:randomUUID()"/></xpf:string>
         </xpf:map>
@@ -115,11 +123,13 @@
             <xpf:array key="type">
                 <xpf:string IRI="https://schema.pearson.com/ns/xkos/IdentifierAxiom">MatchAxiom</xpf:string>
             </xpf:array>
-            <xpf:string key="id">
-                <xsl:value-of select="@urn"/>
-            </xpf:string>
+            <xsl:if test="@urn">
+                <xpf:string key="id">
+                    <xsl:value-of select="@urn"/>
+                </xpf:string>
+            </xsl:if>
             <xsl:variable name="set" select="@testSet"/>
-            <xsl:variable name="learningObjectives" select="//document[contains(@testSet, $set) and @type = 'EducationalGoal']"/>
+            <xsl:variable name="learningObjectives" select="//document[contains(@testSet, $set) and @type = 'EducationalGoal' and @urn]"/>
             <xsl:variable name="randomNumbers" select="rd:random-sequence(2)"/>
             <xsl:variable name="subjectLOindex" select="xs:integer($randomNumbers[1] * count($learningObjectives) + 1)" as="xs:integer?"/>
             <xsl:variable name="targetLOindex" select="xs:integer($randomNumbers[2] * count($learningObjectives) + 1)" as="xs:integer?"/>
@@ -136,9 +146,11 @@
             <xpf:array key="type">
                 <xpf:string IRI="https://schema.pearson.com/ns/learn/LearningObjective">LearningObjective</xpf:string>
             </xpf:array>
-            <xpf:string key="id">
-                <xsl:value-of select="@urn"/>
-            </xpf:string>
+            <xsl:if test="@urn">
+                <xpf:string key="id">
+                    <xsl:value-of select="@urn"/>
+                </xpf:string>
+            </xsl:if>
             <xsl:call-template name="getLearningObjectiveDescription"/>
             <xsl:call-template name="getLearningDimension"/>
         </xpf:map>

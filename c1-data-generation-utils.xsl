@@ -37,14 +37,14 @@
         <xsl:for-each select="tokenize($testSet, ' ')">
             <xsl:variable name="set" select="."/>
             <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
-                '[Y0001][M01][D01]')}/{$env}/xml/{$set}/{lower-case(translate($documentType, ' ', ''))}/{lower-case(translate($documentType, ' ', ''))}-{$documentUuid}.xml" method="xml">
+                '[Y0001][M01][D01]')}/{$env}/xml/{$set}/{if (not($documentURN)) then 'no-urn/' else 'urn/'}{lower-case(translate($documentType, ' ', ''))}/{lower-case(translate($documentType, ' ', ''))}-{$documentUuid}.xml" method="xml">
                 <xpf:map>
                     <xsl:copy-of select="$context"/>
                     <xsl:copy-of select="$documentContent/*"/>
                 </xpf:map>
             </xsl:result-document>        
             <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
-                '[Y0001][M01][D01]')}/{$env}/json/{$set}/{lower-case(translate($documentType, ' ', ''))}/{lower-case(translate($documentType, ' ', ''))}-{$documentUuid}.json" method="text">
+                '[Y0001][M01][D01]')}/{$env}/json/{$set}/{if (not($documentURN)) then 'no-urn/' else 'urn/'}{lower-case(translate($documentType, ' ', ''))}/{lower-case(translate($documentType, ' ', ''))}-{$documentUuid}.json" method="text">
                 <xsl:call-template name="jld:XML-to-JSON">
                     <xsl:with-param name="XMLinput">
                         <xpf:map>
@@ -55,6 +55,9 @@
                 </xsl:call-template>
             </xsl:result-document>
             <xsl:if test="contains($testSet, 'seedData')">
+                <xsl:if test="$documentURN = ''">
+                    <xsl:message terminate="yes">No URN on seed data item</xsl:message>
+                </xsl:if>
                 <xsl:call-template name="jld:xml-to-quads">
                     <xsl:with-param name="XMLinput">
                         <xpf:map>
