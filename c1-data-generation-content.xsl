@@ -29,7 +29,7 @@
             </xsl:if>
             <xpf:map key="name" IRI="http://schema.org/name" type="LanguageContainer">
                 <xpf:string key="en" IRI="http://schema.org/name" language="en">
-                    <xsl:value-of select="c1:getName()"/>
+                    <xsl:value-of select="c1:getName(position())"/>
                 </xpf:string>
             </xpf:map>
             <xsl:apply-templates select="relation" mode="AddRelationships"/>
@@ -59,7 +59,7 @@
             </xsl:if>
             <xpf:map key="name" IRI="http://schema.org/name" type="LanguageContainer">
                 <xpf:string key="en" IRI="http://schema.org/name" language="en">
-                    <xsl:value-of select="c1:getName()"/>
+                    <xsl:value-of select="c1:getName(position())"/>
                 </xpf:string>
             </xpf:map>
             <xsl:apply-templates select="parent::relation" mode="AddReverseRelationships"/>
@@ -71,6 +71,23 @@
             <xsl:call-template name="getSubjects">
                 <xsl:with-param name="subjectCount" select="$subjectCount"/>               
             </xsl:call-template>
+            <!-- Generate a PATCH for this Work -->
+            <xsl:if test="@patchSet">
+                <xpf:array key="replacement" type="IRI" IRI="https://schema.pearson.com/ns/changeset/addition" patchContent="true">
+                    <xpf:map>
+                        <xpf:map key="@context">
+                            <xpf:string key="@language">en</xpf:string>
+                        </xpf:map>
+                        <xpf:string key="subject" IRI="https://schema.pearson.com/ns/changeset/subject" type="IRI">
+                            <xsl:value-of select="@urn"/>
+                        </xpf:string>
+                        <xpf:string key="predicate" IRI="https://schema.pearson.com/ns/changeset/predicate" type="IRI">http://schema.org/name</xpf:string>
+                        <xpf:string key="object" IRI="https://schema.pearson.com/ns/changeset/object">
+                            <xsl:value-of select="c1:getName(position() + 1)"/>                       
+                        </xpf:string>
+                    </xpf:map>
+                </xpf:array>
+            </xsl:if>
         </xpf:map>
     </xsl:template>
 
@@ -91,7 +108,7 @@
             </xsl:if>
             <xpf:map key="name" IRI="http://schema.org/name" type="LanguageContainer">
                 <xpf:string key="en" IRI="http://schema.org/name" language="en">
-                    <xsl:value-of select="c1:getName()"/>
+                    <xsl:value-of select="c1:getName(position())"/>
                 </xpf:string>
             </xpf:map>
             <xsl:apply-templates select="parent::relation" mode="AddReverseRelationships"/>
@@ -100,6 +117,22 @@
             <xsl:call-template name="getFormat">
                 <xsl:with-param name="types" select="$getTypes"/>
             </xsl:call-template>
+            <xsl:if test="@patchSet">
+                <xpf:array key="replacement" type="IRI" IRI="https://schema.pearson.com/ns/changeset/addition" patchContent="true">
+                    <xpf:map>
+                        <xpf:map key="@context">
+                            <xpf:string key="@language">en</xpf:string>
+                        </xpf:map>
+                        <xpf:string key="subject" IRI="https://schema.pearson.com/ns/changeset/subject" type="IRI">
+                            <xsl:value-of select="@urn"/>
+                        </xpf:string>
+                        <xpf:string key="predicate" IRI="https://schema.pearson.com/ns/changeset/predicate" type="IRI">http://schema.org/name</xpf:string>
+                        <xpf:string key="object" IRI="https://schema.pearson.com/ns/changeset/object">
+                            <xsl:value-of select="c1:getName(position() + 1)"/>                       
+                        </xpf:string>
+                    </xpf:map>
+                </xpf:array>
+            </xsl:if>
         </xpf:map>
     </xsl:template>
 
@@ -115,6 +148,19 @@
             </xsl:if>
             <xpf:string key="idTerm" type="IRI" IRI="https://schema.pearson.com/ns/xowl/idTerm">https://schema.pearson.com/ns/system/epsID</xpf:string>
             <xpf:string key="idValue" type="IRI" IRI="https://schema.pearson.com/ns/xowl/idValue">urn:pearson:eps:<xsl:value-of select="uuid:randomUUID()"/></xpf:string>
+            <xsl:if test="@patchSet">
+                <xpf:array key="replacement" type="IRI" IRI="https://schema.pearson.com/ns/changeset/addition" patchContent="true">
+                    <xpf:map>
+                        <xpf:string key="subject" IRI="https://schema.pearson.com/ns/changeset/subject" type="IRI">
+                            <xsl:value-of select="@urn"/>
+                        </xpf:string>
+                        <xpf:string key="predicate" IRI="https://schema.pearson.com/ns/changeset/predicate" type="IRI">https://schema.pearson.com/ns/xowl/idValue</xpf:string>
+                        <xpf:map key="object" IRI="https://schema.pearson.com/ns/changeset/object">
+                            <xpf:string key="id">urn:pearson:eps:<xsl:value-of select="uuid:randomUUID()"/></xpf:string>
+                        </xpf:map>
+                    </xpf:map>
+                </xpf:array>
+            </xsl:if>
         </xpf:map>
     </xsl:template>
 
@@ -130,7 +176,7 @@
             </xsl:if>
             <xsl:variable name="set" select="@testSet"/>
             <xsl:variable name="learningObjectives" select="//document[contains(@testSet, $set) and @type = 'EducationalGoal' and @urn]"/>
-            <xsl:variable name="randomNumbers" select="rd:random-sequence(2)"/>
+            <xsl:variable name="randomNumbers" select="rd:random-sequence(2, position())"/>
             <xsl:variable name="subjectLOindex" select="xs:integer($randomNumbers[1] * count($learningObjectives) + 1)" as="xs:integer?"/>
             <xsl:variable name="targetLOindex" select="xs:integer($randomNumbers[2] * count($learningObjectives) + 1)" as="xs:integer?"/>
             <xsl:variable name="subjectLO" select="$learningObjectives[$subjectLOindex]/@urn"/>                    
@@ -138,6 +184,19 @@
             <xpf:string key="matchType" type="IRI" IRI="https://schema.pearson.com/ns/xkos/matchType">http://www.w3.org/2004/02/skos/core#exactMatch</xpf:string>
             <xpf:string key="matchSubject" type="IRI" IRI="https://schema.pearson.com/ns/xkos/matchSubject"><xsl:value-of select="$subjectLO"/></xpf:string>
             <xpf:string key="matchTarget" type="IRI" IRI="https://schema.pearson.com/ns/xkos/matchTarget"><xsl:value-of select="$targetLO"/></xpf:string>
+            <xsl:if test="@patchSet">
+                <xpf:array key="replacement" type="IRI" IRI="https://schema.pearson.com/ns/changeset/addition" patchContent="true">
+                    <xpf:map>
+                        <xpf:string key="subject" IRI="https://schema.pearson.com/ns/changeset/subject" type="IRI">
+                            <xsl:value-of select="@urn"/>
+                        </xpf:string>
+                        <xpf:string key="predicate" IRI="https://schema.pearson.com/ns/changeset/predicate" type="IRI">https://schema.pearson.com/ns/xkos/matchType</xpf:string>
+                        <xpf:map key="object" IRI="https://schema.pearson.com/ns/changeset/object">
+                            <xpf:string key="id">http://www.w3.org/2004/02/skos/core#closeMatch</xpf:string>
+                        </xpf:map>
+                    </xpf:map>
+                </xpf:array>
+            </xsl:if>
         </xpf:map>
     </xsl:template>
     
@@ -151,8 +210,29 @@
                     <xsl:value-of select="@urn"/>
                 </xpf:string>
             </xsl:if>
-            <xsl:call-template name="getLearningObjectiveDescription"/>
-            <xsl:call-template name="getLearningDimension"/>
+            <xsl:call-template name="getLearningObjectiveDescription">
+                <xsl:with-param name="seed" select="position()"/>
+            </xsl:call-template>
+            <xsl:call-template name="getLearningDimension">
+                <xsl:with-param name="seed" select="position()"/>
+            </xsl:call-template>
+            <xsl:if test="@patchSet">
+                <xpf:array key="replacement" type="IRI" IRI="https://schema.pearson.com/ns/changeset/addition" patchContent="true">
+                    <xpf:map>
+                        <xpf:string key="subject" IRI="https://schema.pearson.com/ns/changeset/subject" type="IRI">
+                            <xsl:value-of select="@urn"/>
+                        </xpf:string>
+                        <xpf:string key="predicate" IRI="https://schema.pearson.com/ns/changeset/predicate" type="IRI">https://schema.pearson.com/ns/learn/learningDimension</xpf:string>
+                        <xpf:string key="object" IRI="https://schema.pearson.com/ns/changeset/object">
+                            <xsl:variable name="dimensionIndex" select="
+                                for $num in rd:random-sequence(1, position() + 1)
+                                return
+                                xs:integer(floor($num * count($learningDimension)))"/>
+                            <xsl:value-of select="$learningDimension[$dimensionIndex]"/>                       
+                        </xpf:string>
+                    </xpf:map>
+                </xpf:array>
+            </xsl:if>
         </xpf:map>
     </xsl:template>
     

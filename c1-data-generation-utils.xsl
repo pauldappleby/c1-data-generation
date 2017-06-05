@@ -40,20 +40,34 @@
                 '[Y0001][M01][D01]')}/{$env}/xml/{$set}/{if (not($documentURN)) then 'no-urn/' else 'urn/'}{lower-case(translate($documentType, ' ', ''))}/{lower-case(translate($documentType, ' ', ''))}-{$documentUuid}.xml" method="xml">
                 <xpf:map>
                     <xsl:copy-of select="$context"/>
-                    <xsl:copy-of select="$documentContent/*"/>
+                    <xsl:copy-of select="$documentContent/*[not(@patchContent)]"/>
                 </xpf:map>
-            </xsl:result-document>        
+            </xsl:result-document>  
             <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
                 '[Y0001][M01][D01]')}/{$env}/json/{$set}/{if (not($documentURN)) then 'no-urn/' else 'urn/'}{lower-case(translate($documentType, ' ', ''))}/{lower-case(translate($documentType, ' ', ''))}-{$documentUuid}.json" method="text">
                 <xsl:call-template name="jld:XML-to-JSON">
                     <xsl:with-param name="XMLinput">
                         <xpf:map>
                             <xsl:copy-of select="$context"/>
-                            <xsl:copy-of select="$documentContent/*"/>
+                            <xsl:copy-of select="$documentContent/*[not(@patchContent)]"/>
                         </xpf:map>
                     </xsl:with-param>
                 </xsl:call-template>
             </xsl:result-document>
+            <!-- Is there a PATCH document? -->
+            <xsl:if test="$documentContent/*[@patchContent]">
+                <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
+                    '[Y0001][M01][D01]')}/{$env}/json/performanceDataPATCH/{lower-case(translate($documentType, ' ', ''))}/{lower-case(translate($documentType, ' ', ''))}-{$documentUuid}.json" method="text">
+                    <xsl:call-template name="jld:XML-to-JSON">
+                        <xsl:with-param name="XMLinput">
+                            <xpf:map>
+                                <xsl:copy-of select="$context"/>
+                                <xsl:copy-of select="$documentContent/*[@patchContent]"/>
+                            </xpf:map>
+                        </xsl:with-param>
+                    </xsl:call-template>
+                </xsl:result-document>
+            </xsl:if>
             <xsl:if test="contains($testSet, 'seedData')">
                 <xsl:if test="$documentURN = ''">
                     <xsl:message terminate="yes">No URN on seed data item</xsl:message>
@@ -104,9 +118,10 @@
     </xsl:template>
    
     <xsl:function name="c1:getName" as="xs:string">
-        <xsl:variable name="adjective" select="for $num in rd:random-sequence(1) return
+        <xsl:param name="seed"/>
+        <xsl:variable name="adjective" select="for $num in rd:random-sequence(1, $seed) return
             xs:integer(floor($num * count($words/adjectives/*)) + 1)"/>
-        <xsl:variable name="noun" select="for $num in rd:random-sequence(1) return
+        <xsl:variable name="noun" select="for $num in rd:random-sequence(1, $seed) return
             xs:integer(floor($num * count($words/nouns/*)) + 1)"/>
         <xsl:value-of>
             <xsl:text>The </xsl:text>
@@ -159,8 +174,9 @@
     </xsl:template>
 
     <xsl:template name="getLearningObjectiveDescription">
+        <xsl:param name="seed"/>
         <xsl:variable name="descriptionIndex" select="
-            for $num in rd:random-sequence(1)
+            for $num in rd:random-sequence(1, $seed)
             return
             xs:integer(floor($num * count($learningObjectiveDescription)))"/>
         <xpf:map key="description" IRI="http://schema.org/description">
@@ -171,8 +187,9 @@
     </xsl:template>
 
     <xsl:template name="getLearningDimension">
+        <xsl:param name="seed"/>
         <xsl:variable name="dimensionIndex" select="
-            for $num in rd:random-sequence(1)
+            for $num in rd:random-sequence(1, $seed)
             return
             xs:integer(floor($num * count($learningDimension)))"/>
         <xpf:array key="learningDimension" IRI="https://schema.pearson.com/ns/learn/learningDimension">

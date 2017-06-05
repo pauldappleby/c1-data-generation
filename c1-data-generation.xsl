@@ -23,6 +23,8 @@
     <xsl:param name="numWorkContainers">10</xsl:param>
 
     <!-- Number of items to generate for performances data -->
+    <!-- We generated additional works without relations to Manifestations to check raw Work performance -->
+    <xsl:param name="numPerfWorks">10</xsl:param>
     <xsl:param name="numPerfMatchAxioms">10</xsl:param>
     <xsl:param name="numPerfManifestations">10</xsl:param>
     <xsl:param name="numPerfLearningObjectives">10</xsl:param>
@@ -106,10 +108,18 @@
                     <document testSet="performanceData" type="Work" uuid="{$uuid2}" epsValue="{$includeEPSidentifierValues[$workIndex]}"/>
                 </xsl:for-each>
 
+                <!-- These are to test POSTing Works to the API -->
+                <xsl:for-each select="1 to $numPerfWorks">
+                    <xsl:variable name="workUuid" select="uuid:randomUUID()"/>                                
+                    <document testSet="performanceData" type="Work" uuid="{$workUuid}" urn="urn:pearson:work:{$workUuid}" patchSet="performanceDataPATCH"/>                    
+                    <document testSet="performanceDataPUT" type="Work" uuid="{$workUuid}" urn="urn:pearson:work:{$workUuid}"/>                    
+                </xsl:for-each>
+                
                 <!-- These are to test POSTing Manifestations to the API -->
                 <xsl:for-each select="1 to $numPerfManifestations">
                     <xsl:variable name="manifestationUuid" select="uuid:randomUUID()"/>                                
-                    <document testSet="performanceData" type="Manifestation" uuid="{$manifestationUuid}" urn="urn:pearson:manifestation:{$manifestationUuid}"/>                    
+                    <document testSet="performanceData" type="Manifestation" uuid="{$manifestationUuid}" urn="urn:pearson:manifestation:{$manifestationUuid}" patchSet="performanceDataPATCH"/>                    
+                    <document testSet="performanceDataPUT" type="Manifestation" uuid="{$manifestationUuid}" urn="urn:pearson:manifestation:{$manifestationUuid}"/>                    
                 </xsl:for-each>
 
                 <!-- These are to test POSTing Manifestations to the API with no URNs. Note we generate a UUID just to name the file -->
@@ -121,13 +131,15 @@
                 <!-- These are to test POSTing learning objectives to the API -->
                 <xsl:for-each select="1 to $numPerfLearningObjectives">
                     <xsl:variable name="learningObjectiveUuid" select="uuid:randomUUID()"/>                                
-                    <document testSet="performanceData" type="EducationalGoal" uuid="{$learningObjectiveUuid}" urn="urn:pearson:educationalgoal:{$learningObjectiveUuid}"/>                    
+                    <document testSet="performanceData" type="EducationalGoal" uuid="{$learningObjectiveUuid}" urn="urn:pearson:educationalgoal:{$learningObjectiveUuid}" patchSet="performanceDataPATCH"/>                    
+                    <document testSet="performanceDataPUT" type="EducationalGoal" uuid="{$learningObjectiveUuid}" urn="urn:pearson:educationalgoal:{$learningObjectiveUuid}"/>                    
                 </xsl:for-each>
                
                 <!-- These are to test POSTing IdentifierAxioms to the API -->
                 <xsl:for-each select="1 to $numPerfIdentifierAxioms">
                     <xsl:variable name="identifierAxiomUuid" select="uuid:randomUUID()"/>                                
-                    <document testSet="performanceData" type="IdentifierAxiom" uuid="{$identifierAxiomUuid}" urn="urn:pearson:identifier:{$identifierAxiomUuid}"/>                    
+                    <document testSet="performanceData" type="IdentifierAxiom" uuid="{$identifierAxiomUuid}" urn="urn:pearson:identifier:{$identifierAxiomUuid}" patchSet="performanceDataPATCH"/>                    
+                    <document testSet="performanceDataPUT" type="IdentifierAxiom" uuid="{$identifierAxiomUuid}" urn="urn:pearson:identifier:{$identifierAxiomUuid}"/>                    
                 </xsl:for-each>
 
                 <!-- These are to test POSTing IdentifierAxioms to the API with no URN -->
@@ -139,7 +151,8 @@
                 <!-- These are to test POSTing MatchAxioms to the API -->
                 <xsl:for-each select="1 to $numPerfMatchAxioms">
                     <xsl:variable name="matchAxiomUuid" select="uuid:randomUUID()"/>                                
-                    <document testSet="performanceData" type="MatchAxiom" uuid="{$matchAxiomUuid}" urn="urn:pearson:match:{$matchAxiomUuid}"/>                    
+                    <document testSet="performanceData" type="MatchAxiom" uuid="{$matchAxiomUuid}" urn="urn:pearson:match:{$matchAxiomUuid}" patchSet="performanceDataPATCH"/>                    
+                    <document testSet="performanceDataPUT" type="MatchAxiom" uuid="{$matchAxiomUuid}" urn="urn:pearson:match:{$matchAxiomUuid}"/>                    
                 </xsl:for-each>
                 
             </documents>
@@ -186,45 +199,48 @@
         <!-- We generate a CURL output so that all files can be loaded up automatically -->
         <xsl:for-each select="distinct-values($processingStructure//document/@testSet/tokenize(., ' '))">
             <xsl:variable name="testSet" select="."/>
-            <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
-                '[Y0001][M01][D01]')}/{$env}/{$testSet}-urn-curl-file.bat" method="text">
-                <xsl:text>md results&#10;</xsl:text>
-                <xsl:variable name="documentCount" select="count($processingStructure//document[contains(@testSet, $testSet) and @urn])"/>
-                <xsl:for-each select="$processingStructure//document[contains(@testSet, $testSet) and @urn]">
-                    <!-- We do the deepest children first because they get used by ancestors so need to be loaded into API first -->
-                    <xsl:sort select="count(ancestor::*)" order="descending"/>
-                    <xsl:text>timeout 1&#10;</xsl:text>
-                    <xsl:text>echo </xsl:text>
-                    <xsl:value-of select="concat(position(), ' of ', $documentCount)"/>
-                    <xsl:text>&#10;</xsl:text>
-                    <xsl:call-template name="GenerateCurlWriteListEntry">
-                        <xsl:with-param name="type" select="@type"/>
-                        <xsl:with-param name="uuid" select="@uuid"/>
-                        <xsl:with-param name="urn" select="@urn"/>
-                        <xsl:with-param name="testSet" select="$testSet"/>
-                    </xsl:call-template>
-                </xsl:for-each>
-            </xsl:result-document>
-            <!-- And for no URN -->
-            <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
-                '[Y0001][M01][D01]')}/{$env}/{$testSet}-no-urn-curl-file.bat" method="text">
-                <xsl:text>md results&#10;</xsl:text>
-                <xsl:variable name="documentCount" select="count($processingStructure//document[contains(@testSet, $testSet) and not(@urn)])"/>
-                <xsl:for-each select="$processingStructure//document[contains(@testSet, $testSet) and not(@urn)]">
-                    <!-- We do the deepest children first because they get used by ancestors so need to be loaded into API first -->
-                    <xsl:sort select="count(ancestor::*)" order="descending"/>
-                    <xsl:text>timeout 1&#10;</xsl:text>
-                    <xsl:text>echo </xsl:text>
-                    <xsl:value-of select="concat(position(), ' of ', $documentCount)"/>
-                    <xsl:text>&#10;</xsl:text>
-                    <xsl:call-template name="GenerateCurlWriteListEntry">
-                        <xsl:with-param name="type" select="@type"/>
-                        <xsl:with-param name="uuid" select="@uuid"/>
-                        <xsl:with-param name="urn" select="@urn"/>
-                        <xsl:with-param name="testSet" select="$testSet"/>
-                    </xsl:call-template>
-                </xsl:for-each>
-            </xsl:result-document>  
+            <!-- We don't include certain test sets because they are designed for subsequent calls -->
+            <xsl:if test="not($testSet = ('performanceDataPUT'))">
+                <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
+                    '[Y0001][M01][D01]')}/{$env}/{$testSet}-urn-curl-file.bat" method="text">
+                    <xsl:text>md results&#10;</xsl:text>
+                    <xsl:variable name="documentCount" select="count($processingStructure//document[contains(@testSet, $testSet) and @urn])"/>
+                    <xsl:for-each select="$processingStructure//document[contains(@testSet, $testSet) and @urn]">
+                        <!-- We do the deepest children first because they get used by ancestors so need to be loaded into API first -->
+                        <xsl:sort select="count(ancestor::*)" order="descending"/>
+                        <xsl:text>timeout 1&#10;</xsl:text>
+                        <xsl:text>echo </xsl:text>
+                        <xsl:value-of select="concat(position(), ' of ', $documentCount)"/>
+                        <xsl:text>&#10;</xsl:text>
+                        <xsl:call-template name="GenerateCurlWriteListEntry">
+                            <xsl:with-param name="type" select="@type"/>
+                            <xsl:with-param name="uuid" select="@uuid"/>
+                            <xsl:with-param name="urn" select="@urn"/>
+                            <xsl:with-param name="testSet" select="$testSet"/>
+                        </xsl:call-template>
+                    </xsl:for-each>
+                </xsl:result-document>
+                <!-- And for no URN -->
+                <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
+                    '[Y0001][M01][D01]')}/{$env}/{$testSet}-no-urn-curl-file.bat" method="text">
+                    <xsl:text>md results&#10;</xsl:text>
+                    <xsl:variable name="documentCount" select="count($processingStructure//document[contains(@testSet, $testSet) and not(@urn)])"/>
+                    <xsl:for-each select="$processingStructure//document[contains(@testSet, $testSet) and not(@urn)]">
+                        <!-- We do the deepest children first because they get used by ancestors so need to be loaded into API first -->
+                        <xsl:sort select="count(ancestor::*)" order="descending"/>
+                        <xsl:text>timeout 1&#10;</xsl:text>
+                        <xsl:text>echo </xsl:text>
+                        <xsl:value-of select="concat(position(), ' of ', $documentCount)"/>
+                        <xsl:text>&#10;</xsl:text>
+                        <xsl:call-template name="GenerateCurlWriteListEntry">
+                            <xsl:with-param name="type" select="@type"/>
+                            <xsl:with-param name="uuid" select="@uuid"/>
+                            <xsl:with-param name="urn" select="@urn"/>
+                            <xsl:with-param name="testSet" select="$testSet"/>
+                        </xsl:call-template>
+                    </xsl:for-each>
+                </xsl:result-document>
+            </xsl:if>
         </xsl:for-each>
 
         <!-- We generate a CURL output so that all files can be read automatically (if they have a pre-generated URN) -->
