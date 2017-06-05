@@ -223,13 +223,15 @@
                             <xsl:value-of select="@urn"/>
                         </xpf:string>
                         <xpf:string key="predicate" IRI="https://schema.pearson.com/ns/changeset/predicate" type="IRI">https://schema.pearson.com/ns/learn/learningDimension</xpf:string>
-                        <xpf:string key="object" IRI="https://schema.pearson.com/ns/changeset/object">
+                        <xpf:map key="object" IRI="https://schema.pearson.com/ns/changeset/object">
                             <xsl:variable name="dimensionIndex" select="
                                 for $num in rd:random-sequence(1, position() + 1)
                                 return
                                 xs:integer(floor($num * count($learningDimension)))"/>
-                            <xsl:value-of select="$learningDimension[$dimensionIndex]"/>                       
-                        </xpf:string>
+                            <xpf:string key="id">
+                                <xsl:value-of select="$learningDimension[$dimensionIndex]"/>
+                            </xpf:string>                  
+                        </xpf:map>
                     </xpf:map>
                 </xpf:array>
             </xsl:if>
