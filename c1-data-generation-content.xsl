@@ -21,6 +21,7 @@
                 <xsl:with-param name="baseTypeIRI">https://schema.pearson.com/ns/content/Work</xsl:with-param>
                 <xsl:with-param name="extendedTypes" select="('Container')"/>
                 <xsl:with-param name="extendedTypesIRIs" select="('https://schema.pearson.com/ns/content/Container')"/>
+                <xsl:with-param name="seed" select="c1:seedFromUUID(@uuid)"/>                 
             </xsl:call-template>
             <xsl:if test="@urn">
                 <xpf:string key="id">
@@ -33,7 +34,9 @@
                 </xpf:string>
             </xpf:map>
             <xsl:apply-templates select="relation" mode="AddRelationships"/>
-            <xsl:call-template name="getDateCreated"/>
+            <xsl:call-template name="getDateCreated">
+                <xsl:with-param name="seed" select="c1:seedFromUUID(@uuid)"/>
+            </xsl:call-template>
             <xsl:call-template name="getKeywords">
                 <xsl:with-param name="keysCount" select="$keywordCount"/>
             </xsl:call-template>
@@ -51,6 +54,7 @@
             <xsl:call-template name="getType">
                 <xsl:with-param name="baseType">Work</xsl:with-param>
                 <xsl:with-param name="baseTypeIRI">https://schema.pearson.com/ns/content/Work</xsl:with-param>
+                <xsl:with-param name="seed" select="c1:seedFromUUID(@uuid)"/>                 
             </xsl:call-template>
             <xsl:if test="@urn">
                 <xpf:string key="id">
@@ -64,7 +68,9 @@
             </xpf:map>
             <xsl:apply-templates select="parent::relation" mode="AddReverseRelationships"/>
             <xsl:apply-templates select="relation" mode="AddRelationships"/>
-            <xsl:call-template name="getDateCreated"/>
+            <xsl:call-template name="getDateCreated">
+                <xsl:with-param name="seed" select="c1:seedFromUUID(@uuid)"/>
+            </xsl:call-template>
             <xsl:call-template name="getKeywords">
                 <xsl:with-param name="keysCount" select="$keywordCount"/>
             </xsl:call-template>
@@ -98,6 +104,7 @@
                 <xsl:call-template name="getType">
                     <xsl:with-param name="baseType">Manifestation</xsl:with-param>
                     <xsl:with-param name="baseTypeIRI">https://schema.pearson.com/ns/content/Manifestation</xsl:with-param>
+                    <xsl:with-param name="seed" select="c1:seedFromUUID(@uuid)"/>                 
                 </xsl:call-template>
             </xsl:variable>
             <xsl:copy-of select="$getTypes"/>
@@ -108,15 +115,21 @@
             </xsl:if>
             <xpf:map key="name" IRI="http://schema.org/name" type="LanguageContainer">
                 <xpf:string key="en" IRI="http://schema.org/name" language="en">
-                    <xsl:value-of select="c1:getName(position())"/>
+                    <xsl:value-of select="c1:getName(c1:seedFromUUID(@uuid))"/>
                 </xpf:string>
             </xpf:map>
             <xsl:apply-templates select="parent::relation" mode="AddReverseRelationships"/>
             <xsl:apply-templates select="relation" mode="AddRelationships"/>
-            <xsl:call-template name="getDateCreated"/>
-            <xsl:call-template name="getFormat">
-                <xsl:with-param name="types" select="$getTypes"/>
+            <xsl:call-template name="getDateCreated">
+                <xsl:with-param name="seed" select="c1:seedFromUUID(@uuid)"/>
             </xsl:call-template>
+            <!-- Exclude is for testing -->
+            <xsl:if test="not(contains(@exclude, 'formats'))">
+                <xsl:call-template name="getFormat">
+                    <xsl:with-param name="types" select="$getTypes"/>
+                    <xsl:with-param name="seed" select="c1:seedFromUUID(@uuid)"/>
+                </xsl:call-template>
+            </xsl:if>
             <xsl:if test="@patchSet">
                 <xpf:array key="replacement" type="IRI" IRI="https://schema.pearson.com/ns/changeset/addition" patchContent="true">
                     <xpf:map>
@@ -128,7 +141,7 @@
                         </xpf:string>
                         <xpf:string key="predicate" IRI="https://schema.pearson.com/ns/changeset/predicate" type="IRI">http://schema.org/name</xpf:string>
                         <xpf:string key="object" IRI="https://schema.pearson.com/ns/changeset/object">
-                            <xsl:value-of select="c1:getName(position() + 1)"/>                       
+                            <xsl:value-of select="c1:getName(c1:seedFromUUID(@uuid) + 1)"/>                       
                         </xpf:string>
                     </xpf:map>
                 </xpf:array>
@@ -176,7 +189,7 @@
             </xsl:if>
             <xsl:variable name="set" select="@testSet"/>
             <xsl:variable name="learningObjectives" select="//document[contains(@testSet, $set) and @type = 'EducationalGoal' and @urn]"/>
-            <xsl:variable name="randomNumbers" select="rd:random-sequence(2, position())"/>
+            <xsl:variable name="randomNumbers" select="rd:random-sequence(2, c1:seedFromUUID(@uuid))"/>
             <xsl:variable name="subjectLOindex" select="xs:integer($randomNumbers[1] * count($learningObjectives) + 1)" as="xs:integer?"/>
             <xsl:variable name="targetLOindex" select="xs:integer($randomNumbers[2] * count($learningObjectives) + 1)" as="xs:integer?"/>
             <xsl:variable name="subjectLO" select="$learningObjectives[$subjectLOindex]/@urn"/>                    
@@ -199,6 +212,20 @@
             </xsl:if>
         </xpf:map>
     </xsl:template>
+
+    <xsl:template match="document[@type = 'GoalFramework']">
+        <xpf:map>
+            <xpf:array key="type">
+                <xpf:string IRI="https://schema.pearson.com/ns/learn/GoalFramework">GoalFramework</xpf:string>
+            </xpf:array>
+            <xsl:if test="@urn">
+                <xpf:string key="id">
+                    <xsl:value-of select="@urn"/>
+                </xpf:string>
+            </xsl:if>
+            <xsl:apply-templates select="relation" mode="AddRelationships"/>
+        </xpf:map>
+    </xsl:template>
     
     <xsl:template match="document[@type = 'EducationalGoal']">
         <xpf:map>
@@ -211,10 +238,10 @@
                 </xpf:string>
             </xsl:if>
             <xsl:call-template name="getLearningObjectiveDescription">
-                <xsl:with-param name="seed" select="position()"/>
+                <xsl:with-param name="seed" select="c1:seedFromUUID(@uuid)"/>
             </xsl:call-template>
             <xsl:call-template name="getLearningDimension">
-                <xsl:with-param name="seed" select="position()"/>
+                <xsl:with-param name="seed" select="c1:seedFromUUID(@uuid)"/>
             </xsl:call-template>
             <xsl:if test="@patchSet">
                 <xpf:array key="replacement" type="IRI" IRI="https://schema.pearson.com/ns/changeset/addition" patchContent="true">
@@ -248,6 +275,16 @@
                         <xsl:value-of select="."/>
                     </xpf:string>
                 </xsl:for-each>
+            </xpf:array>
+        </xsl:if>
+    </xsl:template>
+
+    <xsl:template match="relation[@embed = 'true']" mode="AddRelationships">
+        <xsl:variable name="relatedUrns" select="document"/>
+        <xsl:if test="not(empty($relatedUrns))">
+            <xsl:variable name="iri" select="@IRI"/>
+            <xpf:array key="{@shortName}" IRI="{$iri}">
+                <xsl:apply-templates select="*"/>
             </xpf:array>
         </xsl:if>
     </xsl:template>

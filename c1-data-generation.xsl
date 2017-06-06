@@ -25,6 +25,7 @@
     <!-- Number of items to generate for performances data -->
     <!-- We generated additional works without relations to Manifestations to check raw Work performance -->
     <xsl:param name="numPerfWorks">10</xsl:param>
+    <xsl:param name="numPerfGoalFrameworks">10</xsl:param>
     <xsl:param name="numPerfMatchAxioms">10</xsl:param>
     <xsl:param name="numPerfManifestations">10</xsl:param>
     <xsl:param name="numPerfLearningObjectives">10</xsl:param>
@@ -113,6 +114,44 @@
                     <xsl:variable name="workUuid" select="uuid:randomUUID()"/>                                
                     <document testSet="performanceData" type="Work" uuid="{$workUuid}" urn="urn:pearson:work:{$workUuid}" patchSet="performanceDataPATCH"/>                    
                     <document testSet="performanceDataPUT" type="Work" uuid="{$workUuid}" urn="urn:pearson:work:{$workUuid}"/>                    
+                    <!-- We create nested Work examples -->
+                    <xsl:variable name="uuid1" select="uuid:randomUUID()"/>
+                    <xsl:variable name="uuid2" select="uuid:randomUUID()"/>
+                    <xsl:variable name="workIndex" select="position()"/>
+                    <xsl:variable name="workExampleCount" select="xs:integer(floor($workManifestationCounts[$workIndex] * 5))" as="xs:integer"/>
+                    <!-- We output the Works to performanceData as the Works will be used to test workExample referencing seeded Manifestations -->
+                    <document testSet="embeddedWork" type="Work" uuid="{$uuid1}" urn="urn:pearson:work:{$uuid1}" epsValue="{$includeEPSidentifierValues[$workIndex]}">
+                        <xsl:if test="$workExampleCount > 0">
+                            <!-- We indicate to emed -->
+                            <relation IRI="http://schema.org/workExample" shortName="workExample" embed="true">
+                                <xsl:for-each select="1 to $workExampleCount">
+                                    <xsl:variable name="manifestationUuid" select="uuid:randomUUID()"/>                                
+                                    <document testSet="embeddedWork" type="Manifestation" uuid="{$manifestationUuid}" urn="urn:pearson:manifestation:{$manifestationUuid}">
+                                        <xsl:if test="$includeEPSidentifierValues[$workIndex] &lt; 0.2">
+                                            <relation IRI="https://schema.pearson.com/ns/xowl/identifiedBy" shortName="identifiedBy" embed="true">
+                                                <xsl:variable name="identifierAxiomUuid" select="uuid:randomUUID()"/>                                
+                                                <document testSet="embeddedWork" type="IdentifierAxiom" uuid="{$identifierAxiomUuid}" urn="urn:pearson:identifier:{$identifierAxiomUuid}"/>
+                                            </relation>
+                                        </xsl:if>
+                                    </document>
+                                </xsl:for-each>
+                            </relation>
+                        </xsl:if>
+                    </document>
+                </xsl:for-each>
+
+                <xsl:for-each select="1 to $numPerfGoalFrameworks">
+                    <xsl:variable name="goalframeworkUuid" select="uuid:randomUUID()"/>                                
+                    <xsl:variable name="goalCount" select="xs:integer(floor(rd:random-sequence(1, c1:seedFromUUID($goalframeworkUuid)) * 50))" as="xs:integer"/>
+                    <!-- We output the Works to performanceData as the Works will be used to test workExample referencing seeded Manifestations -->
+                    <document testSet="embeddedGoalFramework" type="GoalFramework" uuid="{$goalframeworkUuid}" urn="urn:pearson:goalframework:{$goalframeworkUuid}">
+                        <relation IRI="https://schema.pearson.com/ns/learn/hasTopGoal" shortName="hasTopGoal" embed="true">
+                            <xsl:for-each select="1 to $goalCount">
+                                <xsl:variable name="goalUuid" select="uuid:randomUUID()"/>                                
+                                <document testSet="embeddedGoalFramework" type="EducationalGoal" uuid="{$goalUuid}" urn="urn:pearson:educationalgoal:{$goalUuid}"/>                                
+                            </xsl:for-each>
+                        </relation>
+                </document>
                 </xsl:for-each>
                 
                 <!-- These are to test POSTing Manifestations to the API -->
@@ -205,7 +244,7 @@
                     '[Y0001][M01][D01]')}/{$env}/{$testSet}-urn-curl-file.bat" method="text">
                     <xsl:text>md results&#10;</xsl:text>
                     <xsl:variable name="documentCount" select="count($processingStructure//document[contains(@testSet, $testSet) and @urn])"/>
-                    <xsl:for-each select="$processingStructure//document[contains(@testSet, $testSet) and @urn]">
+                    <xsl:for-each select="$processingStructure//document[contains(@testSet, $testSet) and @urn and not(parent::relation[@embed = 'true'])]">
                         <!-- We do the deepest children first because they get used by ancestors so need to be loaded into API first -->
                         <xsl:sort select="count(ancestor::*)" order="descending"/>
                         <xsl:text>timeout 1&#10;</xsl:text>

@@ -10,7 +10,8 @@
     xmlns:rd="http://exslt.org/random"
     xmlns:c1="http://schema.pearson.com/ns/c1">    
 
-    <xsl:template match="document[@type = ('EducationalGoal', 'MatchAxiom', 'IdentifierAxiom', 'Manifestation', 'Work', 'Work Container')]" priority="100">
+    <xsl:template match="document[@type = ('GoalFramework', 'EducationalGoal', 'MatchAxiom', 'IdentifierAxiom', 'Manifestation', 'Work', 'Work Container')][not(parent::relation[@embed = 'true'])]"
+        priority="100">
         <xsl:param name="outputFolder" tunnel="yes"/>
         <xsl:param name="env" tunnel="yes"/>
         <xsl:variable name="documentContent" as="element()">
@@ -25,7 +26,7 @@
             <xsl:with-param name="outputFolder" select="$outputFolder"/>
             <xsl:with-param name="env" select="$env"/>
         </xsl:call-template>
-        <xsl:apply-templates select="*"/>
+        <xsl:apply-templates select="*[not(@embed = 'true')]"/>
     </xsl:template>
         
 </xsl:stylesheet>

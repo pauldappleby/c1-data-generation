@@ -100,8 +100,9 @@
         <xsl:param name="baseTypeIRI" required="yes"/>
         <xsl:param name="extendedTypes" as="xs:string*"/>
         <xsl:param name="extendedTypesIRIs" as="xs:string*"/>
+        <xsl:param name="seed"/>
         <xsl:variable name="usableTypes" select="$type/type"/>
-        <xsl:variable name="additionalType" select="for $num in rd:random-sequence(1) return
+        <xsl:variable name="additionalType" select="for $num in rd:random-sequence(1, $seed) return
             xs:integer(floor($num * count($usableTypes)) + 1)"/>
         <xpf:array key="type">
             <xpf:string IRI="{$baseTypeIRI}">
@@ -130,13 +131,19 @@
             <xsl:value-of select="$words/nouns/noun[$noun]"/>
         </xsl:value-of>
     </xsl:function>
- 
+
+    <xsl:function name="c1:seedFromUUID" as="xs:double">
+        <xsl:param name="uuid"/>
+        <xsl:value-of select="xs:double(translate($uuid, 'abcdefghijklmnopqrstuvwxyz-', ''))"/>
+    </xsl:function>
+    
     <xsl:template name="getDateCreated">
+        <xsl:param name="seed"/>
         <!-- Paramaterised for testing -->
-        <xsl:param name="day" select="xs:integer(floor(rd:random-sequence(1) * 28) + 1)" as="xs:integer"/>
-        <xsl:param name="month" select="xs:integer(floor(rd:random-sequence(1) * 12) + 1)" as="xs:integer"/>
-        <xsl:param name="hour" select="xs:integer(floor(rd:random-sequence(1) * 24))" as="xs:integer"/>
-        <xsl:param name="minute" select="xs:integer(floor(rd:random-sequence(1) * 60))" as="xs:integer"/>
+        <xsl:param name="day" select="xs:integer(floor(rd:random-sequence(1, $seed) * 28) + 1)" as="xs:integer"/>
+        <xsl:param name="month" select="xs:integer(floor(rd:random-sequence(1, $seed) * 12) + 1)" as="xs:integer"/>
+        <xsl:param name="hour" select="xs:integer(floor(rd:random-sequence(1, $seed) * 24))" as="xs:integer"/>
+        <xsl:param name="minute" select="xs:integer(floor(rd:random-sequence(1, $seed) * 60))" as="xs:integer"/>
         <xpf:string key="dateCreated" IRI="http://schema.org/dateCreated" type="http://www.w3.org/2001/XMLSchema#dateTime">
             <xsl:text>2016-</xsl:text>
             <xsl:if test="$month &lt; 10">0</xsl:if>
@@ -219,11 +226,12 @@
     <!-- Return a media type given a particular set of input types -->
     <xsl:template name="getFormat" as="element()*">
         <xsl:param name="types"/>
+        <xsl:param name="seed"/>
         <!-- Paramaterised for testing -->
         <xsl:param name="formatIndex" select="
-            for $num in rd:random-sequence(1)
+            for $num in rd:random-sequence(1, $seed)
             return
-                xs:integer(floor($num * count($formats/format[@type = $types//xpf:string])) + 1)" as="xs:integer"/>
+                xs:integer(floor($num * count($formats/format[@type = $types//xpf:string])) + 1)" as="xs:integer?"/>
         <xsl:if test="$formats/format[@type = $types//xpf:string][$formatIndex]">
             <xpf:string key="format" IRI="http://schema.org/fileFormat">
                 <xsl:value-of select="$formats/format[contains($types, @type)][$formatIndex]/@mimetype"/>
