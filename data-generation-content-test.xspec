@@ -340,6 +340,26 @@
                 <xpf:map key="object" IRI="https://schema.pearson.com/ns/changeset/object">
                     <xpf:string key="id">...</xpf:string>
                 </xpf:map>
+            </xpf:map>          
+        </x:expect>
+    </x:scenario>    
+
+    <x:scenario label="When processing a Work PATCH">
+        <x:context mode="PatchReplace">
+            <document testSet="embeddedWork"
+                type="Work"
+                uuid="07ff8b43-e439-4523-9e8d-e000a9e61c1c"
+                urn="urn:pearson:work:07ff8b43-e439-4523-9e8d-e000a9e61c1c"
+                epsValue="0.15815519191256044"/>
+        </x:context>
+        <x:expect label="It should return an XML document">
+            <xpf:map>
+                <xpf:map key="@context">
+                    <xpf:string key="@language">en</xpf:string>
+                </xpf:map>
+                <xpf:string key="subject" IRI="https://schema.pearson.com/ns/changeset/subject" type="IRI">urn:pearson:work:07ff8b43-e439-4523-9e8d-e000a9e61c1c</xpf:string>
+                <xpf:string key="predicate" IRI="https://schema.pearson.com/ns/changeset/predicate" type="IRI">http://schema.org/name</xpf:string>
+                <xpf:string key="object" IRI="https://schema.pearson.com/ns/changeset/object">...</xpf:string>
             </xpf:map>
         </x:expect>
     </x:scenario>    
@@ -364,6 +384,44 @@
                     IRI="https://schema.pearson.com/ns/changeset/predicate"
                     type="IRI">http://schema.org/name</xpf:string>
                 <xpf:string key="object" IRI="https://schema.pearson.com/ns/changeset/object">...</xpf:string>
+            </xpf:map>
+        </x:expect>
+    </x:scenario>    
+        
+    <x:scenario label="When processing a IdentifierAxiom PATCH">
+        <x:context mode="PatchReplace">
+            <document testSet="performanceData"
+                type="IdentifierAxiom"
+                uuid="056b9380-531e-4410-a596-3cb2ff0810d9"
+                urn="urn:pearson:identifier:056b9380-531e-4410-a596-3cb2ff0810d9"
+                patchSet="performanceDataPATCH"/>
+        </x:context>
+        <x:expect label="It should return an XML document">
+            <xpf:map>
+                <xpf:string key="subject" IRI="https://schema.pearson.com/ns/changeset/subject" type="IRI">urn:pearson:identifier:056b9380-531e-4410-a596-3cb2ff0810d9</xpf:string>
+                <xpf:string key="predicate" IRI="https://schema.pearson.com/ns/changeset/predicate" type="IRI">https://schema.pearson.com/ns/xowl/idValue</xpf:string>
+                <xpf:map key="object" IRI="https://schema.pearson.com/ns/changeset/object">
+                    <xpf:string key="id">...</xpf:string>
+                </xpf:map>
+            </xpf:map>
+        </x:expect>
+    </x:scenario>    
+    
+    <x:scenario label="When processing a MatchAxiom PATCH">
+        <x:context mode="PatchReplace">
+            <document testSet="performanceData"
+                type="MatchAxiom"
+                uuid="bf2c5714-f848-42bf-8d8f-9e0f6b6f2482"
+                urn="urn:pearson:match:bf2c5714-f848-42bf-8d8f-9e0f6b6f2482"
+                patchSet="performanceDataPATCH"/>
+        </x:context>
+        <x:expect label="It should return an XML document">
+            <xpf:map>
+                <xpf:string key="subject" IRI="https://schema.pearson.com/ns/changeset/subject" type="IRI">urn:pearson:match:bf2c5714-f848-42bf-8d8f-9e0f6b6f2482</xpf:string>
+                <xpf:string key="predicate" IRI="https://schema.pearson.com/ns/changeset/predicate" type="IRI">https://schema.pearson.com/ns/xkos/matchType</xpf:string>
+                <xpf:map key="object" IRI="https://schema.pearson.com/ns/changeset/object">
+                    <xpf:string key="id">http://www.w3.org/2004/02/skos/core#closeMatch</xpf:string>
+                </xpf:map>
             </xpf:map>
         </x:expect>
     </x:scenario>    

@@ -78,25 +78,25 @@
                 <xsl:with-param name="subjectCount" select="$subjectCount"/>               
             </xsl:call-template>
             <!-- Generate a PATCH for this Work -->
-            <xsl:if test="@patchSet">
-                <xpf:array key="replacement" type="IRI" IRI="https://schema.pearson.com/ns/changeset/addition" patchContent="true">
-                    <xpf:map>
-                        <xpf:map key="@context">
-                            <xpf:string key="@language">en</xpf:string>
-                        </xpf:map>
-                        <xpf:string key="subject" IRI="https://schema.pearson.com/ns/changeset/subject" type="IRI">
-                            <xsl:value-of select="@urn"/>
-                        </xpf:string>
-                        <xpf:string key="predicate" IRI="https://schema.pearson.com/ns/changeset/predicate" type="IRI">http://schema.org/name</xpf:string>
-                        <xpf:string key="object" IRI="https://schema.pearson.com/ns/changeset/object">
-                            <xsl:value-of select="c1:getName(position() + 1)"/>                       
-                        </xpf:string>
-                    </xpf:map>
-                </xpf:array>
-            </xsl:if>
+            <xsl:apply-templates select="." mode="ProcessPatch"/>
         </xpf:map>
     </xsl:template>
 
+    <xsl:template match="document[@type = 'Work']" mode="PatchReplace">
+        <xpf:map>
+            <xpf:map key="@context">
+                <xpf:string key="@language">en</xpf:string>
+            </xpf:map>
+            <xpf:string key="subject" IRI="https://schema.pearson.com/ns/changeset/subject" type="IRI">
+                <xsl:value-of select="@urn"/>
+            </xpf:string>
+            <xpf:string key="predicate" IRI="https://schema.pearson.com/ns/changeset/predicate" type="IRI">http://schema.org/name</xpf:string>
+            <xpf:string key="object" IRI="https://schema.pearson.com/ns/changeset/object">
+                <xsl:value-of select="c1:getName(position() + 1)"/>                       
+            </xpf:string>
+        </xpf:map>
+    </xsl:template>
+    
     <xsl:template match="document[@type = 'Manifestation']">
         <xpf:map>
             <xsl:variable name="uuid" select="@uuid"/>
@@ -130,11 +130,7 @@
                     <xsl:with-param name="seed" select="c1:seedFromUUID(@uuid)"/>
                 </xsl:call-template>
             </xsl:if>
-            <xsl:if test="@patchSet">
-                <xpf:array key="replacement" type="IRI" IRI="https://schema.pearson.com/ns/changeset/addition" patchContent="true">
-                    <xsl:apply-templates select="." mode="PatchReplace"/>
-                </xpf:array>
-            </xsl:if>
+            <xsl:apply-templates select="." mode="ProcessPatch"/>
         </xpf:map>
     </xsl:template>
 
@@ -165,22 +161,22 @@
             </xsl:if>
             <xpf:string key="idTerm" type="IRI" IRI="https://schema.pearson.com/ns/xowl/idTerm">https://schema.pearson.com/ns/system/epsID</xpf:string>
             <xpf:string key="idValue" type="IRI" IRI="https://schema.pearson.com/ns/xowl/idValue">urn:pearson:eps:<xsl:value-of select="uuid:randomUUID()"/></xpf:string>
-            <xsl:if test="@patchSet">
-                <xpf:array key="replacement" type="IRI" IRI="https://schema.pearson.com/ns/changeset/addition" patchContent="true">
-                    <xpf:map>
-                        <xpf:string key="subject" IRI="https://schema.pearson.com/ns/changeset/subject" type="IRI">
-                            <xsl:value-of select="@urn"/>
-                        </xpf:string>
-                        <xpf:string key="predicate" IRI="https://schema.pearson.com/ns/changeset/predicate" type="IRI">https://schema.pearson.com/ns/xowl/idValue</xpf:string>
-                        <xpf:map key="object" IRI="https://schema.pearson.com/ns/changeset/object">
-                            <xpf:string key="id">urn:pearson:eps:<xsl:value-of select="uuid:randomUUID()"/></xpf:string>
-                        </xpf:map>
-                    </xpf:map>
-                </xpf:array>
-            </xsl:if>
+            <xsl:apply-templates select="." mode="ProcessPatch"/>
         </xpf:map>
     </xsl:template>
 
+    <xsl:template match="document[@type = 'IdentifierAxiom']" mode="PatchReplace">
+        <xpf:map>
+            <xpf:string key="subject" IRI="https://schema.pearson.com/ns/changeset/subject" type="IRI">
+                <xsl:value-of select="@urn"/>
+            </xpf:string>
+            <xpf:string key="predicate" IRI="https://schema.pearson.com/ns/changeset/predicate" type="IRI">https://schema.pearson.com/ns/xowl/idValue</xpf:string>
+            <xpf:map key="object" IRI="https://schema.pearson.com/ns/changeset/object">
+                <xpf:string key="id">urn:pearson:eps:<xsl:value-of select="uuid:randomUUID()"/></xpf:string>
+            </xpf:map>
+        </xpf:map>
+    </xsl:template>
+    
     <xsl:template match="document[@type = 'MatchAxiom']">
         <xpf:map>
             <xpf:array key="type">
@@ -201,22 +197,22 @@
             <xpf:string key="matchType" type="IRI" IRI="https://schema.pearson.com/ns/xkos/matchType">http://www.w3.org/2004/02/skos/core#exactMatch</xpf:string>
             <xpf:string key="matchSubject" type="IRI" IRI="https://schema.pearson.com/ns/xkos/matchSubject"><xsl:value-of select="$subjectLO"/></xpf:string>
             <xpf:string key="matchTarget" type="IRI" IRI="https://schema.pearson.com/ns/xkos/matchTarget"><xsl:value-of select="$targetLO"/></xpf:string>
-            <xsl:if test="@patchSet">
-                <xpf:array key="replacement" type="IRI" IRI="https://schema.pearson.com/ns/changeset/addition" patchContent="true">
-                    <xpf:map>
-                        <xpf:string key="subject" IRI="https://schema.pearson.com/ns/changeset/subject" type="IRI">
-                            <xsl:value-of select="@urn"/>
-                        </xpf:string>
-                        <xpf:string key="predicate" IRI="https://schema.pearson.com/ns/changeset/predicate" type="IRI">https://schema.pearson.com/ns/xkos/matchType</xpf:string>
-                        <xpf:map key="object" IRI="https://schema.pearson.com/ns/changeset/object">
-                            <xpf:string key="id">http://www.w3.org/2004/02/skos/core#closeMatch</xpf:string>
-                        </xpf:map>
-                    </xpf:map>
-                </xpf:array>
-            </xsl:if>
+            <xsl:apply-templates select="." mode="ProcessPatch"/>
         </xpf:map>
     </xsl:template>
 
+    <xsl:template match="document[@type = 'MatchAxiom']" mode="PatchReplace">
+        <xpf:map>
+            <xpf:string key="subject" IRI="https://schema.pearson.com/ns/changeset/subject" type="IRI">
+                <xsl:value-of select="@urn"/>
+            </xpf:string>
+            <xpf:string key="predicate" IRI="https://schema.pearson.com/ns/changeset/predicate" type="IRI">https://schema.pearson.com/ns/xkos/matchType</xpf:string>
+            <xpf:map key="object" IRI="https://schema.pearson.com/ns/changeset/object">
+                <xpf:string key="id">http://www.w3.org/2004/02/skos/core#closeMatch</xpf:string>
+            </xpf:map>
+        </xpf:map>
+    </xsl:template>
+    
     <xsl:template match="document[@type = 'GoalFramework']">
         <xpf:map>
             <xpf:array key="type">
@@ -247,11 +243,7 @@
             <xsl:call-template name="getLearningDimension">
                 <xsl:with-param name="seed" select="c1:seedFromUUID(@uuid)"/>
             </xsl:call-template>
-            <xsl:if test="@patchSet">
-                <xpf:array key="replacement" type="IRI" IRI="https://schema.pearson.com/ns/changeset/addition" patchContent="true">
-                    <xsl:apply-templates select="." mode="PatchReplace"/>
-                </xpf:array>
-            </xsl:if>
+            <xsl:apply-templates select="." mode="ProcessPatch"/>
         </xpf:map>
     </xsl:template>
 
@@ -273,6 +265,14 @@
         </xpf:map>
     </xsl:template>
 
+    <xsl:template match="document" mode="ProcessPatch">
+        <xsl:if test="@patchSet">
+            <xpf:array key="replacement" type="IRI" IRI="https://schema.pearson.com/ns/changeset/addition" patchContent="true">
+                <xsl:apply-templates select="." mode="PatchReplace"/>
+            </xpf:array>
+        </xsl:if>    
+    </xsl:template>
+    
     <!-- Generate eTag for a document -->
     <xsl:template match="document" mode="PatchEtags">
         <xpf:map>
