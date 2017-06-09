@@ -23,7 +23,6 @@
         </x:expect>
     </x:scenario>    
 
-
     <x:scenario label="When generating a Work with keywords and subjects">
         <x:context>
             <document type="Work"
@@ -287,6 +286,84 @@
                         </xpf:map>
                     </xpf:map>
                 </xpf:array>
+            </xpf:map>
+        </x:expect>
+    </x:scenario> 
+
+    <x:scenario label="When processing a patch element">
+        <x:context>
+            <patch testSet="multiManifestationPatch"
+                uuid="13adac3d-8349-4ea9-9c1b-dd846b821fb4">
+                <document testSet="performanceData"
+                    type="Manifestation"
+                    uuid="f5398e9d-2636-4368-b62d-ac203b1566ef"
+                    urn="urn:pearson:manifestation:f5398e9d-2636-4368-b62d-ac203b1566ef"
+                    patchSet="performanceDataPATCH"/>
+            </patch>
+        </x:context>
+        <x:expect label="It should return an XML document">
+            <xpf:array key="eTagInformation">...</xpf:array>
+            <xpf:array key="replacement" type="IRI" IRI="https://schema.pearson.com/ns/changeset/addition" patchContent="true">...</xpf:array>
+        </x:expect>
+    </x:scenario>    
+    
+    <x:scenario label="When generating a PATCH etag">
+        <x:context mode="PatchEtags">
+            <document testSet="performanceData"
+                type="Manifestation"
+                uuid="f5398e9d-2636-4368-b62d-ac203b1566ef"
+                urn="urn:pearson:manifestation:f5398e9d-2636-4368-b62d-ac203b1566ef"
+                patchSet="performanceDataPATCH"/>
+        </x:context>
+        <x:expect label="It should return an XML document">
+            <xpf:map>
+                <xpf:string key="eTagResource">urn:pearson:manifestation:f5398e9d-2636-4368-b62d-ac203b1566ef</xpf:string>
+                <xpf:string key="ifMatch">{{f5398e9d-2636-4368-b62d-ac203b1566ef}}</xpf:string>
+            </xpf:map>
+        </x:expect>
+    </x:scenario>    
+
+    <x:scenario label="When processing an EducationalGoal PATCH">
+        <x:context mode="PatchReplace">
+            <document testSet="performanceData"
+                type="EducationalGoal"
+                uuid="16c96185-66f4-428a-ac40-52abeea04f91"
+                urn="urn:pearson:educationalgoal:16c96185-66f4-428a-ac40-52abeea04f91"
+                patchSet="performanceDataPATCH"/>
+        </x:context>
+        <x:expect label="It should return an XML document">
+            <xpf:map>
+                <xpf:string key="subject" IRI="https://schema.pearson.com/ns/changeset/subject" type="IRI"
+                    >urn:pearson:educationalgoal:16c96185-66f4-428a-ac40-52abeea04f91</xpf:string>
+                <xpf:string key="predicate" IRI="https://schema.pearson.com/ns/changeset/predicate"
+                    type="IRI">https://schema.pearson.com/ns/learn/learningDimension</xpf:string>
+                <xpf:map key="object" IRI="https://schema.pearson.com/ns/changeset/object">
+                    <xpf:string key="id">...</xpf:string>
+                </xpf:map>
+            </xpf:map>
+        </x:expect>
+    </x:scenario>    
+
+    <x:scenario label="When processing a Manifestation PATCH">
+        <x:context mode="PatchReplace">
+            <document testSet="performanceData"
+                type="Manifestation"
+                uuid="206bfe17-9b56-408b-9636-d0defe5544bd"
+                urn="urn:pearson:manifestation:206bfe17-9b56-408b-9636-d0defe5544bd"
+                patchSet="performanceDataPATCH"/> 
+        </x:context>
+        <x:expect label="It should return an XML document">
+            <xpf:map>
+                <xpf:map key="@context">
+                    <xpf:string key="@language">en</xpf:string>
+                </xpf:map>
+                <xpf:string key="subject"
+                    IRI="https://schema.pearson.com/ns/changeset/subject"
+                    type="IRI">urn:pearson:manifestation:206bfe17-9b56-408b-9636-d0defe5544bd</xpf:string>
+                <xpf:string key="predicate"
+                    IRI="https://schema.pearson.com/ns/changeset/predicate"
+                    type="IRI">http://schema.org/name</xpf:string>
+                <xpf:string key="object" IRI="https://schema.pearson.com/ns/changeset/object">...</xpf:string>
             </xpf:map>
         </x:expect>
     </x:scenario>    

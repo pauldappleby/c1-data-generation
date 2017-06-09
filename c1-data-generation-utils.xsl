@@ -57,11 +57,24 @@
             <!-- Is there a PATCH document? -->
             <xsl:if test="$documentContent/*[@patchContent]">
                 <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
+                    '[Y0001][M01][D01]')}/{$env}/xml/performanceDataPATCH/{lower-case(translate($documentType, ' ', ''))}/{lower-case(translate($documentType, ' ', ''))}-{$documentUuid}.xml" method="xml">
+                    <xpf:map>
+                        <xpf:array key="@context">
+                            <xpf:string>https://schema.pearson.com/context/changeset-context.jsonld</xpf:string>
+                            <xpf:string>https://schema.pearson.com/context/raf-context.jsonld</xpf:string>
+                        </xpf:array>
+                        <xsl:copy-of select="$documentContent/*[@patchContent]"/>
+                    </xpf:map>
+                </xsl:result-document>
+                <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
                     '[Y0001][M01][D01]')}/{$env}/json/performanceDataPATCH/{lower-case(translate($documentType, ' ', ''))}/{lower-case(translate($documentType, ' ', ''))}-{$documentUuid}.json" method="text">
                     <xsl:call-template name="jld:XML-to-JSON">
                         <xsl:with-param name="XMLinput">
                             <xpf:map>
-                                <xsl:copy-of select="$context"/>
+                                <xpf:array key="@context">
+                                    <xpf:string>https://schema.pearson.com/context/changeset-context.jsonld</xpf:string>
+                                    <xpf:string>https://schema.pearson.com/context/raf-context.jsonld</xpf:string>
+                                </xpf:array>
                                 <xsl:copy-of select="$documentContent/*[@patchContent]"/>
                             </xpf:map>
                         </xsl:with-param>
@@ -93,6 +106,38 @@
                 </xsl:call-template>
             </xsl:if>
         </xsl:for-each>
+    </xsl:template>
+
+    <xsl:template name="savePatch">
+        <xsl:param name="testSet" required="yes"/>
+        <xsl:param name="patchUuid" required="yes"/>
+        <xsl:param name="documentContent" as="element()+" required="yes"/>
+        <xsl:param name="outputFolder" required="yes"/>
+        <xsl:param name="env" required="yes"/>
+        <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
+            '[Y0001][M01][D01]')}/{$env}/xml/{$testSet}/patch/{$patchUuid}.xml" method="xml">
+            <xpf:map>
+                <xpf:array key="@context" xmlns:xpf="http://www.w3.org/2005/xpath-functions">
+                    <xpf:string>https://schema.pearson.com/context/changeset-context.jsonld</xpf:string>
+                    <xpf:string>https://schema.pearson.com/context/raf-context.jsonld</xpf:string>
+                </xpf:array>
+                <xsl:copy-of select="$documentContent"/>
+            </xpf:map>
+        </xsl:result-document>  
+        <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
+            '[Y0001][M01][D01]')}/{$env}/json/{$testSet}/patch/{$patchUuid}.json" method="text">
+            <xsl:call-template name="jld:XML-to-JSON">
+                <xsl:with-param name="XMLinput">
+                    <xpf:map>
+                        <xpf:array key="@context" xmlns:xpf="http://www.w3.org/2005/xpath-functions">
+                            <xpf:string>https://schema.pearson.com/context/changeset-context.jsonld</xpf:string>
+                            <xpf:string>https://schema.pearson.com/context/raf-context.jsonld</xpf:string>
+                        </xpf:array>
+                        <xsl:copy-of select="$documentContent"/>
+                    </xpf:map>
+                </xsl:with-param>
+            </xsl:call-template>
+        </xsl:result-document>
     </xsl:template>
     
     <xsl:template name="getType">

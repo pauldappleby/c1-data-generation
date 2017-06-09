@@ -30,6 +30,7 @@
     <xsl:param name="numPerfManifestations">10</xsl:param>
     <xsl:param name="numPerfLearningObjectives">10</xsl:param>
     <xsl:param name="numPerfIdentifierAxioms">10</xsl:param>
+    <xsl:param name="numPerfMultipleManifestationUpdates">3</xsl:param>
 
     <!-- Value needs to match a name attribute from environmentURLs -->
     <xsl:param name="env">dev</xsl:param>
@@ -46,7 +47,8 @@
     <!-- Seeds for random numbers -->
     <xsl:param name="numWorksSeed">5987907735</xsl:param>
     <xsl:param name="identifierSeed">7537059247</xsl:param>
-               
+    <xsl:param name="numManifestationPatchesSeed">645982377</xsl:param>
+    
     <xsl:template name="generateOutput">
         
         <!-- We generate an XML structure defining the document types to generate and the relationships between them -->
@@ -109,7 +111,7 @@
                     <document testSet="performanceData" type="Work" uuid="{$uuid2}" epsValue="{$includeEPSidentifierValues[$workIndex]}"/>
                 </xsl:for-each>
 
-                <!-- These are to test POSTing Works to the API -->
+                <!-- These are to test POSTing Works with nested resources to the API -->
                 <xsl:for-each select="1 to $numPerfWorks">
                     <xsl:variable name="workUuid" select="uuid:randomUUID()"/>                                
                     <document testSet="performanceData" type="Work" uuid="{$workUuid}" urn="urn:pearson:work:{$workUuid}" patchSet="performanceDataPATCH"/>                    
@@ -142,23 +144,54 @@
 
                 <xsl:for-each select="1 to $numPerfGoalFrameworks">
                     <xsl:variable name="goalframeworkUuid" select="uuid:randomUUID()"/>                                
-                    <xsl:variable name="goalCount" select="xs:integer(floor(rd:random-sequence(1, c1:seedFromUUID($goalframeworkUuid)) * 50))" as="xs:integer"/>
+                    <xsl:variable name="goalCount" select="xs:integer(floor(rd:random-sequence(1, c1:seedFromUUID($goalframeworkUuid)) * 50) + 1)" as="xs:integer"/>
+                    <xsl:variable name="goalList" as="element()+">
+                        <xsl:for-each select="1 to $goalCount">
+                            <xsl:variable name="goalUuid" select="uuid:randomUUID()"/>                                
+                            <document testSet="embeddedGoalFramework" type="EducationalGoal" uuid="{$goalUuid}" urn="urn:pearson:educationalgoal:{$goalUuid}"/>                                
+                            <document type="EducationalGoal" uuid="{$goalUuid}" urn="urn:pearson:educationalgoal:{$goalUuid}"/>                                
+                        </xsl:for-each>                            
+                    </xsl:variable>
                     <!-- We output the Works to performanceData as the Works will be used to test workExample referencing seeded Manifestations -->
                     <document testSet="embeddedGoalFramework" type="GoalFramework" uuid="{$goalframeworkUuid}" urn="urn:pearson:goalframework:{$goalframeworkUuid}">
                         <relation IRI="https://schema.pearson.com/ns/learn/hasTopGoal" shortName="hasTopGoal" embed="true">
-                            <xsl:for-each select="1 to $goalCount">
-                                <xsl:variable name="goalUuid" select="uuid:randomUUID()"/>                                
-                                <document testSet="embeddedGoalFramework" type="EducationalGoal" uuid="{$goalUuid}" urn="urn:pearson:educationalgoal:{$goalUuid}"/>                                
-                            </xsl:for-each>
+                            <xsl:copy-of select="$goalList[@testSet]"/>
                         </relation>
-                </document>
+                    </document>
+                    <xsl:variable name="patchUuid" select="uuid:randomUUID()"/>  
+                    <!-- Generate a multiple resource update that updates all the LOs in this framework -->
+                    <patch testSet="goalFrameworkPatch" uuid="{$patchUuid}">
+                        <xsl:copy-of select="$goalList[not(@testSet)]"/>
+                    </patch>
                 </xsl:for-each>
                 
                 <!-- These are to test POSTing Manifestations to the API -->
-                <xsl:for-each select="1 to $numPerfManifestations">
-                    <xsl:variable name="manifestationUuid" select="uuid:randomUUID()"/>                                
-                    <document testSet="performanceData" type="Manifestation" uuid="{$manifestationUuid}" urn="urn:pearson:manifestation:{$manifestationUuid}" patchSet="performanceDataPATCH"/>                    
-                    <document testSet="performanceDataPUT" type="Manifestation" uuid="{$manifestationUuid}" urn="urn:pearson:manifestation:{$manifestationUuid}"/>                    
+                <xsl:variable name="perfManifestations" as="element()*">
+                    <xsl:for-each select="1 to $numPerfManifestations">
+                        <xsl:variable name="manifestationUuid" select="uuid:randomUUID()"/>                                
+                        <document testSet="performanceData" type="Manifestation" uuid="{$manifestationUuid}" urn="urn:pearson:manifestation:{$manifestationUuid}" patchSet="performanceDataPATCH"/>                    
+                        <document testSet="performanceDataPUT" type="Manifestation" uuid="{$manifestationUuid}" urn="urn:pearson:manifestation:{$manifestationUuid}"/>                    
+                    </xsl:for-each>
+                </xsl:variable>
+                
+                <xsl:copy-of select="$perfManifestations"/>
+                
+                <xsl:for-each select="1 to $numPerfMultipleManifestationUpdates">
+                    <xsl:variable name="listCount" select="xs:integer(floor(rd:random-sequence(1, $numManifestationPatchesSeed + position()) * $numPerfManifestations) + 1)"
+                        as="xs:integer"/>
+                    <xsl:message>List count: <xsl:value-of select="$listCount"/></xsl:message>
+                    <xsl:variable name="patchUuid" select="uuid:randomUUID()"/>  
+                    <patch testSet="multiManifestationPatch" uuid="{$patchUuid}">
+                        <xsl:variable name="listIndexes" select="rd:random-sequence($listCount, $numManifestationPatchesSeed - position())" as="xs:double+"/>
+                        <xsl:variable name="listIndexes" select="distinct-values(
+                                for $listIndex in $listIndexes
+                                return
+                                    xs:integer(floor($listIndex * $numPerfManifestations) + 1)
+                            )"
+                            as="xs:integer+"/>
+                        <xsl:message>List indexes: <xsl:value-of select="$listIndexes"/></xsl:message>
+                        <xsl:copy-of select="$perfManifestations[@testSet = 'performanceData'][position() = $listIndexes]"/>
+                    </patch>                   
                 </xsl:for-each>
 
                 <!-- These are to test POSTing Manifestations to the API with no URNs. Note we generate a UUID just to name the file -->
@@ -198,14 +231,14 @@
         </xsl:variable>
         
         <!-- Every document must be in at least one test set -->
-        <xsl:if test="$processingStructure//document[not(@testSet)]">
+        <xsl:if test="$processingStructure//document[not(@testSet) and not(ancestor::patch)]">
             <xsl:message terminate="yes">Nodes are missing test sets</xsl:message>
         </xsl:if>
         
         <!-- Now we process the generated structure to actually generate all the output grouping together for quads output -->
         <!-- Note in this instance we only include seed data -->
-        <xsl:message select="count($processingStructure/documents/*)"/>
-        <xsl:for-each-group select="$processingStructure/documents/*" group-adjacent="floor(position() div 1000)">
+        <xsl:message select="count($processingStructure/documents/document)"/>
+        <xsl:for-each-group select="$processingStructure/documents/document" group-adjacent="floor(position() div 1000)">
             <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
                 '[Y0001][M01][D01]')}/{$env}/nquads/{current-grouping-key()}.nq" method="text">
                 <xsl:apply-templates select="current-group()">
@@ -229,7 +262,13 @@
                 </xsl:for-each>
             </xsl:result-document>
         </xsl:for-each-group>
-        
+
+        <!-- Generate standalone large PATCH documents -->
+        <xsl:apply-templates select="$processingStructure//patch">
+            <xsl:with-param name="outputFolder" tunnel="yes" select="$outputFolder"/>
+            <xsl:with-param name="env" tunnel="yes" select="$env"/>          
+        </xsl:apply-templates>
+  
         <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
             '[Y0001][M01][D01]')}/{$env}/processing-structure.xml" method="xml">
             <xsl:copy-of select="$processingStructure"/>

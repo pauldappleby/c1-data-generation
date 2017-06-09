@@ -132,23 +132,27 @@
             </xsl:if>
             <xsl:if test="@patchSet">
                 <xpf:array key="replacement" type="IRI" IRI="https://schema.pearson.com/ns/changeset/addition" patchContent="true">
-                    <xpf:map>
-                        <xpf:map key="@context">
-                            <xpf:string key="@language">en</xpf:string>
-                        </xpf:map>
-                        <xpf:string key="subject" IRI="https://schema.pearson.com/ns/changeset/subject" type="IRI">
-                            <xsl:value-of select="@urn"/>
-                        </xpf:string>
-                        <xpf:string key="predicate" IRI="https://schema.pearson.com/ns/changeset/predicate" type="IRI">http://schema.org/name</xpf:string>
-                        <xpf:string key="object" IRI="https://schema.pearson.com/ns/changeset/object">
-                            <xsl:value-of select="c1:getName(c1:seedFromUUID(@uuid) + 1)"/>                       
-                        </xpf:string>
-                    </xpf:map>
+                    <xsl:apply-templates select="." mode="PatchReplace"/>
                 </xpf:array>
             </xsl:if>
         </xpf:map>
     </xsl:template>
 
+    <xsl:template match="document[@type = 'Manifestation']" mode="PatchReplace">
+        <xpf:map>
+            <xpf:map key="@context">
+                <xpf:string key="@language">en</xpf:string>
+            </xpf:map>
+            <xpf:string key="subject" IRI="https://schema.pearson.com/ns/changeset/subject" type="IRI">
+                <xsl:value-of select="@urn"/>
+            </xpf:string>
+            <xpf:string key="predicate" IRI="https://schema.pearson.com/ns/changeset/predicate" type="IRI">http://schema.org/name</xpf:string>
+            <xpf:string key="object" IRI="https://schema.pearson.com/ns/changeset/object">
+                <xsl:value-of select="c1:getName(c1:seedFromUUID(@uuid) + 1)"/>                       
+            </xpf:string>
+        </xpf:map>
+    </xsl:template>
+    
     <xsl:template match="document[@type = 'IdentifierAxiom']">
         <xpf:map>
             <xpf:array key="type">
@@ -245,24 +249,45 @@
             </xsl:call-template>
             <xsl:if test="@patchSet">
                 <xpf:array key="replacement" type="IRI" IRI="https://schema.pearson.com/ns/changeset/addition" patchContent="true">
-                    <xpf:map>
-                        <xpf:string key="subject" IRI="https://schema.pearson.com/ns/changeset/subject" type="IRI">
-                            <xsl:value-of select="@urn"/>
-                        </xpf:string>
-                        <xpf:string key="predicate" IRI="https://schema.pearson.com/ns/changeset/predicate" type="IRI">https://schema.pearson.com/ns/learn/learningDimension</xpf:string>
-                        <xpf:map key="object" IRI="https://schema.pearson.com/ns/changeset/object">
-                            <xsl:variable name="dimensionIndex" select="
-                                for $num in rd:random-sequence(1, position() + 1)
-                                return
-                                xs:integer(floor($num * count($learningDimension)))"/>
-                            <xpf:string key="id">
-                                <xsl:value-of select="$learningDimension[$dimensionIndex]"/>
-                            </xpf:string>                  
-                        </xpf:map>
-                    </xpf:map>
+                    <xsl:apply-templates select="." mode="PatchReplace"/>
                 </xpf:array>
             </xsl:if>
         </xpf:map>
+    </xsl:template>
+
+    <xsl:template match="document[@type = 'EducationalGoal']" mode="PatchReplace">
+        <xpf:map>
+            <xpf:string key="subject" IRI="https://schema.pearson.com/ns/changeset/subject" type="IRI">
+                <xsl:value-of select="@urn"/>
+            </xpf:string>
+            <xpf:string key="predicate" IRI="https://schema.pearson.com/ns/changeset/predicate" type="IRI">https://schema.pearson.com/ns/learn/learningDimension</xpf:string>
+            <xpf:map key="object" IRI="https://schema.pearson.com/ns/changeset/object">
+                <xsl:variable name="dimensionIndex" select="
+                    for $num in rd:random-sequence(1, c1:seedFromUUID(@uuid))
+                    return
+                    xs:integer(floor($num * count($learningDimension)))"/>
+                <xpf:string key="id">
+                    <xsl:value-of select="$learningDimension[$dimensionIndex]"/>
+                </xpf:string>                  
+            </xpf:map>
+        </xpf:map>
+    </xsl:template>
+
+    <!-- Generate eTag for a document -->
+    <xsl:template match="document" mode="PatchEtags">
+        <xpf:map>
+            <xpf:string key="eTagResource"><xsl:value-of select="@urn"/></xpf:string>
+            <xpf:string key="ifMatch">{{<xsl:value-of select="@uuid"/>}}</xpf:string>
+        </xpf:map>
+    </xsl:template>
+        
+    <xsl:template match="patch">
+        <xpf:array key="eTagInformation">
+            <xsl:apply-templates select="document" mode="PatchEtags"/>
+        </xpf:array>
+        <xpf:array key="replacement" type="IRI" IRI="https://schema.pearson.com/ns/changeset/addition" patchContent="true">
+            <xsl:apply-templates select="document" mode="PatchReplace"/>
+        </xpf:array>
     </xsl:template>
     
     <xsl:template match="relation" mode="AddRelationships">
