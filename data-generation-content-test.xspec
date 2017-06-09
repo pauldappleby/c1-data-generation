@@ -76,7 +76,7 @@
                 <xpf:array key="subject" IRI="http://purl.org/dc/terms/subject">
                     <xpf:string type="IRI" IRI="http://purl.org/dc/terms/subject">...</xpf:string>
                 </xpf:array>
-                <xpf:array key="replacement" type="IRI" IRI="https://schema.pearson.com/ns/changeset/addition" patchContent="true">
+                <xpf:array key="replacement" type="IRI" IRI="https://schema.pearson.com/ns/changeset/replacement" patchContent="true">
                     <xpf:map>
                         <xpf:map key="@context">
                             <xpf:string key="@language">en</xpf:string>
@@ -122,7 +122,7 @@
                     <xpf:string key="en" language="en" IRI="http://schema.org/name">...</xpf:string>
                 </xpf:map>
                 <xpf:string key="dateCreated" IRI="http://schema.org/dateCreated" type="http://www.w3.org/2001/XMLSchema#dateTime">...</xpf:string>
-                <xpf:array key="replacement" type="IRI" IRI="https://schema.pearson.com/ns/changeset/addition" patchContent="true">
+                <xpf:array key="replacement" type="IRI" IRI="https://schema.pearson.com/ns/changeset/replacement" patchContent="true">
                     <xpf:map>
                         <xpf:map key="@context">
                             <xpf:string key="@language">en</xpf:string>
@@ -181,7 +181,7 @@
                 <xpf:string key="id">urn:pearson:identifier:f1b43451-2942-415d-b036-3392aaf0fb42</xpf:string>
                 <xpf:string key="idTerm" type="IRI" IRI="https://schema.pearson.com/ns/xowl/idTerm">https://schema.pearson.com/ns/system/epsID</xpf:string>
                 <xpf:string key="idValue" type="IRI" IRI="https://schema.pearson.com/ns/xowl/idValue">...</xpf:string>
-                <xpf:array key="replacement" type="IRI" IRI="https://schema.pearson.com/ns/changeset/addition" patchContent="true">
+                <xpf:array key="replacement" type="IRI" IRI="https://schema.pearson.com/ns/changeset/replacement" patchContent="true">
                     <xpf:map>
                         <xpf:string key="subject" IRI="https://schema.pearson.com/ns/changeset/subject" type="IRI">urn:pearson:identifier:f1b43451-2942-415d-b036-3392aaf0fb42</xpf:string>
                         <xpf:string key="predicate" IRI="https://schema.pearson.com/ns/changeset/predicate" type="IRI">https://schema.pearson.com/ns/xowl/idValue</xpf:string>
@@ -224,7 +224,7 @@
                 <xpf:string key="id">urn:pearson:identifier:f1b43451-2942-415d-b036-3392aaf0fb42</xpf:string>
                 <xpf:string key="idTerm" type="IRI" IRI="https://schema.pearson.com/ns/xowl/idTerm">https://schema.pearson.com/ns/system/epsID</xpf:string>
                 <xpf:string key="idValue" type="IRI" IRI="https://schema.pearson.com/ns/xowl/idValue">...</xpf:string>
-                <xpf:array key="replacement" type="IRI" IRI="https://schema.pearson.com/ns/changeset/addition" patchContent="true">
+                <xpf:array key="replacement" type="IRI" IRI="https://schema.pearson.com/ns/changeset/replacement" patchContent="true">
                     <xpf:map>
                         <xpf:string key="subject" IRI="https://schema.pearson.com/ns/changeset/subject" type="IRI">urn:pearson:identifier:f1b43451-2942-415d-b036-3392aaf0fb42</xpf:string>
                         <xpf:string key="predicate" IRI="https://schema.pearson.com/ns/changeset/predicate" type="IRI">https://schema.pearson.com/ns/xowl/idValue</xpf:string>
@@ -277,7 +277,7 @@
                 <xpf:array key="learningDimension" IRI="https://schema.pearson.com/ns/learn/learningDimension">
                     <xpf:string type="IRI" IRI="https://schema.pearson.com/ns/learn/learningDimension">...</xpf:string>
                 </xpf:array>
-                <xpf:array key="replacement" type="IRI" IRI="https://schema.pearson.com/ns/changeset/addition" patchContent="true">
+                <xpf:array key="replacement" type="IRI" IRI="https://schema.pearson.com/ns/changeset/replacement" patchContent="true">
                     <xpf:map>
                         <xpf:string key="subject" IRI="https://schema.pearson.com/ns/changeset/subject" type="IRI">urn:pearson:educationalgoal:61b9f4c5-4570-4c18-b23b-bc0021c0093d</xpf:string>
                         <xpf:string key="predicate" IRI="https://schema.pearson.com/ns/changeset/predicate" type="IRI">https://schema.pearson.com/ns/learn/learningDimension</xpf:string>
@@ -303,7 +303,7 @@
         </x:context>
         <x:expect label="It should return an XML document">
             <xpf:array key="eTagInformation">...</xpf:array>
-            <xpf:array key="replacement" type="IRI" IRI="https://schema.pearson.com/ns/changeset/addition" patchContent="true">...</xpf:array>
+            <xpf:array key="replacement" type="IRI" IRI="https://schema.pearson.com/ns/changeset/replacement" patchContent="true">...</xpf:array>
         </x:expect>
     </x:scenario>    
     
@@ -323,7 +323,7 @@
         </x:expect>
     </x:scenario>    
 
-    <x:scenario label="When processing an EducationalGoal PATCH">
+    <x:scenario label="When processing an EducationalGoal PATCH as a replacement">
         <x:context mode="PatchReplace">
             <document testSet="performanceData"
                 type="EducationalGoal"
@@ -344,7 +344,7 @@
         </x:expect>
     </x:scenario>    
 
-    <x:scenario label="When processing a Work PATCH">
+    <x:scenario label="When processing a Work PATCH as a replacement">
         <x:context mode="PatchReplace">
             <document testSet="embeddedWork"
                 type="Work"
@@ -364,7 +364,7 @@
         </x:expect>
     </x:scenario>    
 
-    <x:scenario label="When processing a Manifestation PATCH">
+    <x:scenario label="When processing a Manifestation PATCH as a replacement">
         <x:context mode="PatchReplace">
             <document testSet="performanceData"
                 type="Manifestation"
@@ -388,7 +388,7 @@
         </x:expect>
     </x:scenario>    
         
-    <x:scenario label="When processing a IdentifierAxiom PATCH">
+    <x:scenario label="When processing a IdentifierAxiom PATCH as a replacement">
         <x:context mode="PatchReplace">
             <document testSet="performanceData"
                 type="IdentifierAxiom"
@@ -407,7 +407,7 @@
         </x:expect>
     </x:scenario>    
     
-    <x:scenario label="When processing a MatchAxiom PATCH">
+    <x:scenario label="When processing a MatchAxiom PATCH as a replacement">
         <x:context mode="PatchReplace">
             <document testSet="performanceData"
                 type="MatchAxiom"
@@ -415,7 +415,7 @@
                 urn="urn:pearson:match:bf2c5714-f848-42bf-8d8f-9e0f6b6f2482"
                 patchSet="performanceDataPATCH"/>
         </x:context>
-        <x:expect label="It should return an XML document">
+        <x:expect label="It should return an XML document contains the replacement structure">
             <xpf:map>
                 <xpf:string key="subject" IRI="https://schema.pearson.com/ns/changeset/subject" type="IRI">urn:pearson:match:bf2c5714-f848-42bf-8d8f-9e0f6b6f2482</xpf:string>
                 <xpf:string key="predicate" IRI="https://schema.pearson.com/ns/changeset/predicate" type="IRI">https://schema.pearson.com/ns/xkos/matchType</xpf:string>

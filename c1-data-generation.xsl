@@ -8,7 +8,16 @@
     version="2.0"
     xmlns:uuid="java:java.util.UUID"
     xmlns:rd="http://exslt.org/random"
-    xmlns:c1="http://schema.pearson.com/ns/c1">    
+    xmlns:c1="http://schema.pearson.com/ns/c1">   
+    
+    <!--
+        This codes generates seed and performance data for MDS
+        
+        Unit tests are written in XSpec and accompany this code
+        
+        This code has been developed using Oxygen with embedded Saxon PE 9.5.1.3
+        
+    -->
 
     <xsl:import href="c1-data-generation-content.xsl"/>
     
@@ -51,10 +60,28 @@
     
     <xsl:template name="generateOutput">
         
-        <!-- We generate an XML structure defining the document types to generate and the relationships between them -->
+        <!--
+            We generate an XML structure defining the document types to generate and the relationships between them. The general structure is:
+            
+            <documents>
+                <document>
+                    <relation>
+                </document>
+              <patch>
+                <document>
+              </patch>
+              ...
+            </documents>
+            
+            We also include information for generating PATCHes for certain documents and also dedicated PATCH documents for bulk patching.
+            The structure of this document is then saved as processing-structure.xml (for debugging purposes).
+        -->
         <xsl:variable name="processingStructure">
             <documents>
- 
+                <!-- 
+                    Work containers are Works that have Works as parts.
+                    We generate the container documents and Works and relate them through the hasPart relationship.
+                -->
                 <xsl:variable name="hasPartCounts" select="rd:random-sequence($numWorkContainers)"/>
                 <xsl:for-each select="1 to $numWorkContainers">
                     <xsl:variable name="uuid" select="uuid:randomUUID()"/>
@@ -70,6 +97,7 @@
                     </document>
                 </xsl:for-each>
                
+                <!-- We generate nested Manifestation outputs. Nested beens we have other resources embedded in the payload -->
                 <xsl:variable name="workManifestationCounts" select="rd:random-sequence($numWorks, $numWorksSeed)"/>
                 <!-- 20% of Manifestations will be given EPS IDs -->
                 <xsl:variable name="includeEPSidentifierValues" select="rd:random-sequence($numWorks, $identifierSeed)" as="xs:double*"/>

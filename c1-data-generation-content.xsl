@@ -82,6 +82,7 @@
         </xpf:map>
     </xsl:template>
 
+    <!-- Output for a PATCH replacement -->
     <xsl:template match="document[@type = 'Work']" mode="PatchReplace">
         <xpf:map>
             <xpf:map key="@context">
@@ -267,7 +268,7 @@
 
     <xsl:template match="document" mode="ProcessPatch">
         <xsl:if test="@patchSet">
-            <xpf:array key="replacement" type="IRI" IRI="https://schema.pearson.com/ns/changeset/addition" patchContent="true">
+            <xpf:array key="replacement" type="IRI" IRI="https://schema.pearson.com/ns/changeset/replacement" patchContent="true">
                 <xsl:apply-templates select="." mode="PatchReplace"/>
             </xpf:array>
         </xsl:if>    
@@ -280,12 +281,13 @@
             <xpf:string key="ifMatch">{{<xsl:value-of select="@uuid"/>}}</xpf:string>
         </xpf:map>
     </xsl:template>
-        
+    
+    <!-- For patch elements, which are for bulk patches, we need to generate eTag information in the payload -->    
     <xsl:template match="patch">
         <xpf:array key="eTagInformation">
             <xsl:apply-templates select="document" mode="PatchEtags"/>
         </xpf:array>
-        <xpf:array key="replacement" type="IRI" IRI="https://schema.pearson.com/ns/changeset/addition" patchContent="true">
+        <xpf:array key="replacement" type="IRI" IRI="https://schema.pearson.com/ns/changeset/replacement" patchContent="true">
             <xsl:apply-templates select="document" mode="PatchReplace"/>
         </xpf:array>
     </xsl:template>

@@ -10,6 +10,8 @@
     xmlns:rd="http://exslt.org/random"
     xmlns:c1="http://schema.pearson.com/ns/c1">    
 
+    <!-- We give these template matches a high priority to ensure they get matches first. We then use next-match to actually do the processing -->
+
     <xsl:template match="document[@type = ('GoalFramework', 'EducationalGoal', 'MatchAxiom', 'IdentifierAxiom', 'Manifestation', 'Work', 'Work Container')][not(parent::relation[@embed = 'true'])]"
         priority="100">
         <xsl:param name="outputFolder" tunnel="yes"/>
