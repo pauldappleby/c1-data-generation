@@ -188,7 +188,7 @@
                     </document>
                     <xsl:variable name="patchUuid" select="uuid:randomUUID()"/>  
                     <!-- Generate a multiple resource update that updates all the LOs in this framework -->
-                    <patch testSet="goalFrameworkPatch" uuid="{$patchUuid}">
+                    <patch testSet="goalFrameworkPatch" uuid="{$patchUuid}" correspondingUrn="urn:pearson:goalframework{$goalframeworkUuid}">
                         <xsl:copy-of select="$goalList[not(@testSet)]"/>
                     </patch>
                 </xsl:for-each>
@@ -275,22 +275,13 @@
                 </xsl:apply-templates>
                 <!-- Add in named graph quads -->
                 <xsl:for-each select="current-group()/descendant-or-self::document[contains(@testSet, 'seedData')]">
-                    <xsl:variable name="url" select="concat('https://data.pearson.com/graph/', translate(substring-after(@urn, 'pearson:'), ':', '/'))"/>
-                    <xsl:text>&lt;</xsl:text>
-                    <xsl:value-of select="$url"/>
-                    <xsl:text>&gt; &lt;https://schema.pearson.com/ns/raf/latest&gt; "1"^^&lt;http://www.w3.org/2001/XMLSchema#int&gt; &lt;https://data.pearson.com/graph-metadata&gt; .&#10;</xsl:text>
-                    <xsl:text>&lt;</xsl:text>
-                    <xsl:value-of select="$url"/>
-                    <xsl:text>&gt; &lt;https://schema.pearson.com/ns/raf/checkedout&gt; "true"^^&lt;http://www.w3.org/2001/XMLSchema#boolean&gt; &lt;https://data.pearson.com/graph-metadata&gt; .&#10;</xsl:text>
-                    <xsl:text>&lt;</xsl:text>
-                    <xsl:value-of select="$url"/>
-                    <xsl:text>&gt; &lt;https://schema.pearson.com/ns/raf/revision&gt; &lt;</xsl:text>
-                    <xsl:value-of select="$url"/>
-                    <xsl:text>/1&gt; &lt;https://data.pearson.com/graph-metadata&gt; .&#10;</xsl:text>
+                    <xsl:call-template name="GenerateMetadataGraphQuads">
+                        <xsl:with-param name="urn" select="@urn"/>
+                    </xsl:call-template>
                 </xsl:for-each>
             </xsl:result-document>
         </xsl:for-each-group>
-
+        
         <!-- Generate standalone large PATCH documents -->
         <xsl:apply-templates select="$processingStructure//patch">
             <xsl:with-param name="outputFolder" tunnel="yes" select="$outputFolder"/>
@@ -392,8 +383,40 @@
             </xsl:for-each>
         </xsl:for-each>
 
+        <!-- We generate a list of all patch mappings to associate bulk patches with UUIDs -->
+        <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
+            '[Y0001][M01][D01]')}/{$env}/patch-crossref.txt" method="text">
+            <xsl:for-each select="$processingStructure/*/patch">
+                <xsl:value-of select="@uuid"/>
+                <xsl:text>&#9;</xsl:text>
+                <xsl:value-of select="@correspondingUrn"/>
+                <xsl:text>&#10;</xsl:text>
+            </xsl:for-each>
+        </xsl:result-document>  
+        
     </xsl:template>
 
+    <xsl:template name="GenerateMetadataGraphQuads">
+        <xsl:param name="urn" required="yes"/>
+        <xsl:variable name="graphUrl" select="concat('https://data.pearson.com/graph/', translate(substring-after($urn, 'pearson:'), ':', '/'))"/>
+        <xsl:variable name="metadataGraphUrl" select="concat('https://data.pearson.com/metadata/graph/', translate(substring-after($urn, 'pearson:'), ':', '/'))"/>
+        <xsl:text>&lt;</xsl:text>
+        <xsl:value-of select="$graphUrl"/>
+        <xsl:text>&gt; &lt;https://schema.pearson.com/ns/raf/latest&gt; "1"^^&lt;http://www.w3.org/2001/XMLSchema#int&gt; &lt;</xsl:text>
+        <xsl:value-of select="$metadataGraphUrl"/>
+        <xsl:text>&gt; .&#10;&lt;</xsl:text>
+        <xsl:value-of select="$graphUrl"/>
+        <xsl:text>&gt; &lt;https://schema.pearson.com/ns/raf/checkedout&gt; "true"^^&lt;http://www.w3.org/2001/XMLSchema#boolean&gt; &lt;</xsl:text>
+        <xsl:value-of select="$metadataGraphUrl"/>
+        <xsl:text>&gt; .&#10;&lt;</xsl:text>
+        <xsl:value-of select="$graphUrl"/>
+        <xsl:text>&gt; &lt;https://schema.pearson.com/ns/raf/revision&gt; &lt;</xsl:text>
+        <xsl:value-of select="$graphUrl"/>
+        <xsl:text>/1&gt; &lt;</xsl:text>
+        <xsl:value-of select="$metadataGraphUrl"/>
+        <xsl:text>&gt; .&#10;</xsl:text>         
+    </xsl:template>
+    
     <xsl:template name="GenerateCurlWriteListEntry">
         <xsl:param name="type" required="yes"/>
         <xsl:param name="uuid" required="yes"/>
