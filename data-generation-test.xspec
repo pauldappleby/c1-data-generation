@@ -5,6 +5,7 @@
     
     <x:param name="env">dev</x:param>
     <x:param name="devDB">qa0</x:param>
+    <x:param name="timestamp">1497947191865</x:param>
 
     <x:scenario label="When processing a documents element">
         <x:context>
@@ -17,7 +18,7 @@
         <x:call template="GenerateMetadataGraphQuads">
             <x:param name="urn">urn:pearson:work:39f97183-76f9-4f87-851b-3c974716b6bd</x:param>
         </x:call>
-        <x:expect label="It should return a set of quads">&lt;https://data.pearson.com/graph/work/39f97183-76f9-4f87-851b-3c974716b6bd&gt; &lt;https://schema.pearson.com/ns/raf/latest&gt; "1"^^&lt;http://www.w3.org/2001/XMLSchema#int&gt; &lt;https://data.pearson.com/metadata/graph/work/39f97183-76f9-4f87-851b-3c974716b6bd&gt; .&#10;&lt;https://data.pearson.com/graph/work/39f97183-76f9-4f87-851b-3c974716b6bd&gt; &lt;https://schema.pearson.com/ns/raf/checkedout&gt; "true"^^&lt;http://www.w3.org/2001/XMLSchema#boolean&gt; &lt;https://data.pearson.com/metadata/graph/work/39f97183-76f9-4f87-851b-3c974716b6bd&gt; .&#10;&lt;https://data.pearson.com/graph/work/39f97183-76f9-4f87-851b-3c974716b6bd&gt; &lt;https://schema.pearson.com/ns/raf/revision&gt; &lt;https://data.pearson.com/graph/work/39f97183-76f9-4f87-851b-3c974716b6bd/1&gt; &lt;https://data.pearson.com/metadata/graph/work/39f97183-76f9-4f87-851b-3c974716b6bd> .&#10;</x:expect>
+        <x:expect label="It should return a set of quads">&lt;https://data.pearson.com/graph/work/39f97183-76f9-4f87-851b-3c974716b6bd&gt; &lt;https://schema.pearson.com/ns/raf/entityTag&gt; "W/1497947191865" &lt;https://data.pearson.com/metadata/graph/work/39f97183-76f9-4f87-851b-3c974716b6bd&gt; .&#10;&lt;https://data.pearson.com/graph/work/39f97183-76f9-4f87-851b-3c974716b6bd&gt; &lt;https://schema.pearson.com/ns/raf/latest&gt; "1"^^&lt;http://www.w3.org/2001/XMLSchema#int&gt; &lt;https://data.pearson.com/metadata/graph/work/39f97183-76f9-4f87-851b-3c974716b6bd&gt; .&#10;&lt;https://data.pearson.com/graph/work/39f97183-76f9-4f87-851b-3c974716b6bd&gt; &lt;https://schema.pearson.com/ns/raf/checkedout&gt; "true"^^&lt;http://www.w3.org/2001/XMLSchema#boolean&gt; &lt;https://data.pearson.com/metadata/graph/work/39f97183-76f9-4f87-851b-3c974716b6bd&gt; .&#10;&lt;https://data.pearson.com/graph/work/39f97183-76f9-4f87-851b-3c974716b6bd&gt; &lt;https://schema.pearson.com/ns/raf/revision&gt; &lt;https://data.pearson.com/graph/work/39f97183-76f9-4f87-851b-3c974716b6bd/1&gt; &lt;https://data.pearson.com/metadata/graph/work/39f97183-76f9-4f87-851b-3c974716b6bd> .&#10;</x:expect>
     </x:scenario>               
 
     <x:scenario label="When generating a URI list entry">

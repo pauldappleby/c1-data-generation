@@ -20,7 +20,8 @@
     <xsl:variable name="context" select="document('context.xml')"/>   
     <xsl:variable name="type" select="document('seed-data/types.xml')/types"/>
     <xsl:variable name="formats" select="document('seed-data/formats.xml')/formats"/>
-    <xsl:variable name="keywords" select="$words/(adjectives | nouns)/*"/>
+    <xsl:variable name="adjectives" select="tokenize($words/adjectives, '&#10;')" as="xs:string*"/>
+    <xsl:variable name="keywords" select="$adjectives, $words/nouns/*"/>
     <!-- This data comes from a sample using the migrated CMT data -->
     <xsl:variable name="learningObjectiveDescription" select="tokenize(unparsed-text('seed-data/learning-objective.txt'), '&#13;&#10;')" as="xs:string+"/>   
     <!-- This data comes from a sample using the migrated CMT data -->
@@ -36,13 +37,13 @@
         <xsl:param name="env" required="yes"/>
         <xsl:for-each select="tokenize($testSet, ' ')">
             <xsl:variable name="set" select="."/>
-            <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
+            <!--<xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
                 '[Y0001][M01][D01]')}/{$env}/xml/{$set}/{if (not($documentURN)) then 'no-urn/' else 'urn/'}{lower-case(translate($documentType, ' ', ''))}/{lower-case(translate($documentType, ' ', ''))}-{$documentUuid}.xml" method="xml">
                 <xpf:map>
                     <xsl:copy-of select="$context"/>
                     <xsl:copy-of select="$documentContent/*[not(@patchContent)]"/>
                 </xpf:map>
-            </xsl:result-document>  
+            </xsl:result-document>-->  
             <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
                 '[Y0001][M01][D01]')}/{$env}/json/{$set}/{if (not($documentURN)) then 'no-urn/' else 'urn/'}{lower-case(translate($documentType, ' ', ''))}/{lower-case(translate($documentType, ' ', ''))}-{$documentUuid}.json" method="text">
                 <xsl:call-template name="jld:XML-to-JSON">
@@ -56,7 +57,7 @@
             </xsl:result-document>
             <!-- Is there a PATCH document? -->
             <xsl:if test="$documentContent/*[@patchContent]">
-                <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
+                <!--<xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
                     '[Y0001][M01][D01]')}/{$env}/xml/performanceDataPATCH/{lower-case(translate($documentType, ' ', ''))}/{lower-case(translate($documentType, ' ', ''))}-{$documentUuid}.xml" method="xml">
                     <xpf:map>
                         <xpf:array key="@context">
@@ -65,7 +66,7 @@
                         </xpf:array>
                         <xsl:copy-of select="$documentContent/*[@patchContent]"/>
                     </xpf:map>
-                </xsl:result-document>
+                </xsl:result-document>-->
                 <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
                     '[Y0001][M01][D01]')}/{$env}/json/performanceDataPATCH/{lower-case(translate($documentType, ' ', ''))}/{lower-case(translate($documentType, ' ', ''))}-{$documentUuid}.json" method="text">
                     <xsl:call-template name="jld:XML-to-JSON">
@@ -114,7 +115,7 @@
         <xsl:param name="documentContent" as="element()+" required="yes"/>
         <xsl:param name="outputFolder" required="yes"/>
         <xsl:param name="env" required="yes"/>
-        <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
+        <!--<xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
             '[Y0001][M01][D01]')}/{$env}/xml/{$testSet}/patch/{$patchUuid}.xml" method="xml">
             <xpf:map>
                 <xpf:array key="@context" xmlns:xpf="http://www.w3.org/2005/xpath-functions">
@@ -123,7 +124,7 @@
                 </xpf:array>
                 <xsl:copy-of select="$documentContent"/>
             </xpf:map>
-        </xsl:result-document>  
+        </xsl:result-document>-->  
         <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
             '[Y0001][M01][D01]')}/{$env}/json/{$testSet}/patch/{$patchUuid}.json" method="text">
             <xsl:call-template name="jld:XML-to-JSON">
@@ -165,13 +166,17 @@
    
     <xsl:function name="c1:getName" as="xs:string">
         <xsl:param name="seed"/>
-        <xsl:variable name="adjective" select="for $num in rd:random-sequence(1, $seed) return
-            xs:integer(floor($num * count($words/adjectives/*)) + 1)"/>
-        <xsl:variable name="noun" select="for $num in rd:random-sequence(1, $seed) return
+        <xsl:variable name="rnd" select="rd:random-sequence(3, $seed)"/>
+        <xsl:variable name="adjective" select="for $num in $rnd[1] return
+            xs:integer(floor($num * count($adjectives)) + 1)"/>
+        <xsl:variable name="noun" select="for $num in $rnd[2] return
             xs:integer(floor($num * count($words/nouns/*)) + 1)"/>
         <xsl:value-of>
-            <xsl:text>The </xsl:text>
-            <xsl:value-of select="$words/adjectives/adjective[$adjective]"/>
+            <xsl:choose>
+                <xsl:when test="$rnd[3] &lt; 0.5">The </xsl:when>
+                <xsl:otherwise>A </xsl:otherwise>
+            </xsl:choose>
+            <xsl:value-of select="$adjectives[$adjective]"/>
             <xsl:text> </xsl:text>
             <xsl:value-of select="$words/nouns/noun[$noun]"/>
         </xsl:value-of>

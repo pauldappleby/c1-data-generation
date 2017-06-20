@@ -1,0 +1,15 @@
+To ssh into box
+ssh -i ~/.ssh/pearson ec2-user@ec2-34-249-209-115.eu-west-1.compute.amazonaws.com
+
+To delete existing data
+1. SSH to box
+2. cd /home/ec2-user/marklogic
+3. ./ml local-qa0 delete_performance_data
+
+To load 
+
+1. scp -i ~/.ssh/pearson <ZIP_FILE_PATH> ec2-user@ec2-34-249-209-115.eu-west-1.compute.amazonaws.com:/home/ec2-user/
+2. SSH to box
+3. unzip SCP file
+4. cd /home/ec2-user/marklogic 
+5. ./ml local-qa0 mlcp import -input_file_path ~/nquads -input_file_type RDF -transaction_size 5 -thread_count 4 -fastload true -output_collections "collectionPerformanceData"  -output_graph "collectionPerformanceData" -output_permissions pearson-dataadmin-role,update,pearson-role,read

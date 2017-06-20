@@ -28,18 +28,18 @@
     <xsl:output method="text" indent="yes" exclude-result-prefixes="rd c1 uuid"/>
     
     <!-- Number of items to generate for seed data -->
-    <xsl:param name="numWorks">100</xsl:param>
-    <xsl:param name="numWorkContainers">10</xsl:param>
+    <xsl:param name="numWorks">25000</xsl:param>
+    <xsl:param name="numWorkContainers">10000</xsl:param>
 
     <!-- Number of items to generate for performances data -->
     <!-- We generated additional works without relations to Manifestations to check raw Work performance -->
-    <xsl:param name="numPerfWorks">10</xsl:param>
-    <xsl:param name="numPerfGoalFrameworks">10</xsl:param>
-    <xsl:param name="numPerfMatchAxioms">10</xsl:param>
-    <xsl:param name="numPerfManifestations">10</xsl:param>
-    <xsl:param name="numPerfLearningObjectives">10</xsl:param>
-    <xsl:param name="numPerfIdentifierAxioms">10</xsl:param>
-    <xsl:param name="numPerfMultipleManifestationUpdates">3</xsl:param>
+    <xsl:param name="numPerfWorks">10000</xsl:param>
+    <xsl:param name="numPerfGoalFrameworks">100</xsl:param>
+    <xsl:param name="numPerfMatchAxioms">2500</xsl:param>
+    <xsl:param name="numPerfManifestations">2500</xsl:param>
+    <xsl:param name="numPerfLearningObjectives">2500</xsl:param>
+    <xsl:param name="numPerfIdentifierAxioms">2500</xsl:param>
+    <xsl:param name="numPerfMultipleManifestationUpdates">1000</xsl:param>
 
     <!-- Value needs to match a name attribute from environmentURLs -->
     <xsl:param name="env">dev</xsl:param>
@@ -57,6 +57,8 @@
     <xsl:param name="numWorksSeed">5987907735</xsl:param>
     <xsl:param name="identifierSeed">7537059247</xsl:param>
     <xsl:param name="numManifestationPatchesSeed">645982377</xsl:param>
+    
+    <xsl:param name="timestamp" select="(current-dateTime() - xs:dateTime('1970-01-01T00:00:00')) div xs:dayTimeDuration('PT1S') * 1000"/>
     
     <xsl:template name="generateOutput">
         
@@ -83,6 +85,7 @@
                     We generate the container documents and Works and relate them through the hasPart relationship.
                 -->
                 <xsl:variable name="hasPartCounts" select="rd:random-sequence($numWorkContainers)"/>
+                <xsl:message>Computing work containers</xsl:message>
                 <xsl:for-each select="1 to $numWorkContainers">
                     <xsl:variable name="uuid" select="uuid:randomUUID()"/>
                     <xsl:variable name="hasPartIndex" select="position()"/>
@@ -98,6 +101,7 @@
                 </xsl:for-each>
                
                 <!-- We generate nested Manifestation outputs. Nested beens we have other resources embedded in the payload -->
+                <xsl:message>Computing works</xsl:message>
                 <xsl:variable name="workManifestationCounts" select="rd:random-sequence($numWorks, $numWorksSeed)"/>
                 <!-- 20% of Manifestations will be given EPS IDs -->
                 <xsl:variable name="includeEPSidentifierValues" select="rd:random-sequence($numWorks, $identifierSeed)" as="xs:double*"/>
@@ -140,6 +144,7 @@
                 </xsl:for-each>
 
                 <!-- These are to test POSTing Works with nested resources to the API -->
+                <xsl:message>Computing performance works</xsl:message>
                 <xsl:for-each select="1 to $numPerfWorks">
                     <xsl:variable name="workUuid" select="uuid:randomUUID()"/>                                
                     <document testSet="performanceData" type="Work" uuid="{$workUuid}" urn="urn:pearson:work:{$workUuid}" patchSet="performanceDataPATCH"/>                    
@@ -170,6 +175,7 @@
                     </document>
                 </xsl:for-each>
 
+                <xsl:message>Computing performance goal frameworks</xsl:message>
                 <xsl:for-each select="1 to $numPerfGoalFrameworks">
                     <xsl:variable name="goalframeworkUuid" select="uuid:randomUUID()"/>                                
                     <xsl:variable name="goalCount" select="xs:integer(floor(rd:random-sequence(1, c1:seedFromUUID($goalframeworkUuid)) * 50) + 1)" as="xs:integer"/>
@@ -194,6 +200,7 @@
                 </xsl:for-each>
                 
                 <!-- These are to test POSTing Manifestations to the API -->
+                <xsl:message>Computing performance manifestations</xsl:message>
                 <xsl:variable name="perfManifestations" as="element()*">
                     <xsl:for-each select="1 to $numPerfManifestations">
                         <xsl:variable name="manifestationUuid" select="uuid:randomUUID()"/>                                
@@ -204,10 +211,10 @@
                 
                 <xsl:copy-of select="$perfManifestations"/>
                 
+                <xsl:message>Computing peformance multiple manifestation updates</xsl:message>
                 <xsl:for-each select="1 to $numPerfMultipleManifestationUpdates">
-                    <xsl:variable name="listCount" select="xs:integer(floor(rd:random-sequence(1, $numManifestationPatchesSeed + position()) * $numPerfManifestations) + 1)"
+                    <xsl:variable name="listCount" select="min((100, xs:integer(floor(rd:random-sequence(1, $numManifestationPatchesSeed + position()) * $numPerfManifestations) + 1)))"
                         as="xs:integer"/>
-                    <xsl:message>List count: <xsl:value-of select="$listCount"/></xsl:message>
                     <xsl:variable name="patchUuid" select="uuid:randomUUID()"/>  
                     <patch testSet="multiManifestationPatch" uuid="{$patchUuid}">
                         <xsl:variable name="listIndexes" select="rd:random-sequence($listCount, $numManifestationPatchesSeed - position())" as="xs:double+"/>
@@ -217,18 +224,19 @@
                                     xs:integer(floor($listIndex * $numPerfManifestations) + 1)
                             )"
                             as="xs:integer+"/>
-                        <xsl:message>List indexes: <xsl:value-of select="$listIndexes"/></xsl:message>
                         <xsl:copy-of select="$perfManifestations[@testSet = 'performanceData'][position() = $listIndexes]"/>
                     </patch>                   
                 </xsl:for-each>
 
                 <!-- These are to test POSTing Manifestations to the API with no URNs. Note we generate a UUID just to name the file -->
+                <xsl:message>Computing performance manifestations</xsl:message>
                 <xsl:for-each select="1 to $numPerfManifestations">
                     <xsl:variable name="manifestationUuid" select="uuid:randomUUID()"/>                                
                     <document testSet="performanceData" type="Manifestation" uuid="{$manifestationUuid}"/>                    
                 </xsl:for-each>
                 
                 <!-- These are to test POSTing learning objectives to the API -->
+                <xsl:message>Computing performance learning objectives</xsl:message>             
                 <xsl:for-each select="1 to $numPerfLearningObjectives">
                     <xsl:variable name="learningObjectiveUuid" select="uuid:randomUUID()"/>                                
                     <document testSet="performanceData" type="EducationalGoal" uuid="{$learningObjectiveUuid}" urn="urn:pearson:educationalgoal:{$learningObjectiveUuid}" patchSet="performanceDataPATCH"/>                    
@@ -236,6 +244,7 @@
                 </xsl:for-each>
                
                 <!-- These are to test POSTing IdentifierAxioms to the API -->
+                <xsl:message>Computing performance identifier axioms</xsl:message>
                 <xsl:for-each select="1 to $numPerfIdentifierAxioms">
                     <xsl:variable name="identifierAxiomUuid" select="uuid:randomUUID()"/>                                
                     <document testSet="performanceData" type="IdentifierAxiom" uuid="{$identifierAxiomUuid}" urn="urn:pearson:identifier:{$identifierAxiomUuid}" patchSet="performanceDataPATCH"/>                    
@@ -249,6 +258,7 @@
                 </xsl:for-each>
                 
                 <!-- These are to test POSTing MatchAxioms to the API -->
+                <xsl:message>Computing performance match axioms</xsl:message>
                 <xsl:for-each select="1 to $numPerfMatchAxioms">
                     <xsl:variable name="matchAxiomUuid" select="uuid:randomUUID()"/>                                
                     <document testSet="performanceData" type="MatchAxiom" uuid="{$matchAxiomUuid}" urn="urn:pearson:match:{$matchAxiomUuid}" patchSet="performanceDataPATCH"/>                    
@@ -292,23 +302,21 @@
             '[Y0001][M01][D01]')}/{$env}/processing-structure.xml" method="xml">
             <xsl:copy-of select="$processingStructure"/>
         </xsl:result-document>
-            
+        
+        <xsl:variable name="usedTestSets" select="distinct-values($processingStructure//document/@testSet/tokenize(., ' '))"/>
+        
         <!-- We generate a CURL output so that all files can be loaded up automatically -->
-        <xsl:for-each select="distinct-values($processingStructure//document/@testSet/tokenize(., ' '))">
+        <xsl:for-each select="$usedTestSets">
             <xsl:variable name="testSet" select="."/>
             <!-- We don't include certain test sets because they are designed for subsequent calls -->
             <xsl:if test="not($testSet = ('performanceDataPUT'))">
                 <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
                     '[Y0001][M01][D01]')}/{$env}/{$testSet}-urn-curl-file.bat" method="text">
                     <xsl:text>md results&#10;</xsl:text>
-                    <xsl:variable name="documentCount" select="count($processingStructure//document[contains(@testSet, $testSet) and @urn])"/>
                     <xsl:for-each select="$processingStructure//document[contains(@testSet, $testSet) and @urn and not(parent::relation[@embed = 'true'])]">
                         <!-- We do the deepest children first because they get used by ancestors so need to be loaded into API first -->
                         <xsl:sort select="count(ancestor::*)" order="descending"/>
                         <xsl:text>timeout 1&#10;</xsl:text>
-                        <xsl:text>echo </xsl:text>
-                        <xsl:value-of select="concat(position(), ' of ', $documentCount)"/>
-                        <xsl:text>&#10;</xsl:text>
                         <xsl:call-template name="GenerateCurlWriteListEntry">
                             <xsl:with-param name="type" select="@type"/>
                             <xsl:with-param name="uuid" select="@uuid"/>
@@ -321,14 +329,10 @@
                 <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
                     '[Y0001][M01][D01]')}/{$env}/{$testSet}-no-urn-curl-file.bat" method="text">
                     <xsl:text>md results&#10;</xsl:text>
-                    <xsl:variable name="documentCount" select="count($processingStructure//document[contains(@testSet, $testSet) and not(@urn)])"/>
                     <xsl:for-each select="$processingStructure//document[contains(@testSet, $testSet) and not(@urn)]">
                         <!-- We do the deepest children first because they get used by ancestors so need to be loaded into API first -->
                         <xsl:sort select="count(ancestor::*)" order="descending"/>
                         <xsl:text>timeout 1&#10;</xsl:text>
-                        <xsl:text>echo </xsl:text>
-                        <xsl:value-of select="concat(position(), ' of ', $documentCount)"/>
-                        <xsl:text>&#10;</xsl:text>
                         <xsl:call-template name="GenerateCurlWriteListEntry">
                             <xsl:with-param name="type" select="@type"/>
                             <xsl:with-param name="uuid" select="@uuid"/>
@@ -339,21 +343,20 @@
                 </xsl:result-document>
             </xsl:if>
         </xsl:for-each>
-
+        
         <!-- We generate a CURL output so that all files can be read automatically (if they have a pre-generated URN) -->
-        <xsl:for-each select="distinct-values($processingStructure//document/@testSet/tokenize(., ' '))">
+        <xsl:for-each select="$usedTestSets">
             <xsl:variable name="testSet" select="."/>
             <xsl:for-each select="distinct-values($processingStructure//document[contains(@testSet, $testSet)]/@type)">
                 <xsl:variable name="type" select="."/>
+                <xsl:variable name="docs" select="$processingStructure//document[contains(@testSet, $testSet) and @type = $type and @urn]"/>
+                <xsl:variable name="documentCount" select="count($docs)"/>
                 <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
                 '[Y0001][M01][D01]')}/{$env}/{$testSet}-{lower-case(translate($type, ' ', ''))}-read-curl-file.bat" method="text">
                     <xsl:text>md results&#10;</xsl:text>
-                    <xsl:variable name="documentCount" select="count($processingStructure//document[contains(@testSet, $testSet) and @type = $type and @urn])"/>
                     <!-- We only include items that have a pre-generated URN -->
-                    <xsl:for-each select="$processingStructure//document[contains(@testSet, $testSet) and @type = $type and @urn]">
+                    <xsl:for-each select="$docs">
                         <xsl:text>timeout 1&#10;</xsl:text>
-                        <xsl:text>echo </xsl:text>
-                        <xsl:value-of select="concat(position(), ' of ', $documentCount)"/>
                         <xsl:text>&#10;</xsl:text>
                         <xsl:call-template name="GenerateCurlReadListEntry">
                             <xsl:with-param name="urn" select="@urn"/>
@@ -361,19 +364,12 @@
                         </xsl:call-template>
                     </xsl:for-each>
                 </xsl:result-document>  
-            </xsl:for-each>
-        </xsl:for-each>
 
-        <!-- We generate a list of all URIs generated (for pre-generated URNs) -->
-        <xsl:for-each select="distinct-values($processingStructure//document/@testSet/tokenize(., ' '))">
-            <xsl:variable name="testSet" select="."/>
-            <xsl:for-each select="distinct-values($processingStructure//document[contains(@testSet, $testSet)]/@type)">
-                <xsl:variable name="type" select="."/>
+                <!-- We generate a list of all URIs generated (for pre-generated URNs) -->
                 <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
                     '[Y0001][M01][D01]')}/{$env}/{$testSet}-{lower-case(translate($type, ' ', ''))}-uri-list.txt" method="text">
-                    <xsl:variable name="documentCount" select="count($processingStructure//document[contains(@testSet, $testSet) and @type = $type and @urn])"/>
                     <!-- We only include items that have a pre-generated URN -->
-                    <xsl:for-each select="$processingStructure//document[contains(@testSet, $testSet) and @type = $type and @urn]">
+                    <xsl:for-each select="$docs">
                         <xsl:call-template name="GenerateURIlistEntry">
                             <xsl:with-param name="urn" select="@urn"/>
                             <xsl:with-param name="uuid" select="@uuid"/>
@@ -382,7 +378,7 @@
                 </xsl:result-document>  
             </xsl:for-each>
         </xsl:for-each>
-
+        
         <!-- We generate a list of all patch mappings to associate bulk patches with UUIDs -->
         <xsl:result-document href="{$outputFolder}/generated-{format-date(current-date(),
             '[Y0001][M01][D01]')}/{$env}/patch-crossref.txt" method="text">
@@ -401,6 +397,12 @@
         <xsl:variable name="graphUrl" select="concat('https://data.pearson.com/graph/', translate(substring-after($urn, 'pearson:'), ':', '/'))"/>
         <xsl:variable name="metadataGraphUrl" select="concat('https://data.pearson.com/metadata/graph/', translate(substring-after($urn, 'pearson:'), ':', '/'))"/>
         <xsl:text>&lt;</xsl:text>
+        <xsl:value-of select="$graphUrl"/>
+        <xsl:text>&gt; &lt;https://schema.pearson.com/ns/raf/entityTag&gt; &quot;W/</xsl:text>
+        <xsl:value-of select="$timestamp"/>
+        <xsl:text>&quot; &lt;</xsl:text>
+        <xsl:value-of select="$metadataGraphUrl"/>
+        <xsl:text>&gt; .&#10;&lt;</xsl:text>
         <xsl:value-of select="$graphUrl"/>
         <xsl:text>&gt; &lt;https://schema.pearson.com/ns/raf/latest&gt; "1"^^&lt;http://www.w3.org/2001/XMLSchema#int&gt; &lt;</xsl:text>
         <xsl:value-of select="$metadataGraphUrl"/>
